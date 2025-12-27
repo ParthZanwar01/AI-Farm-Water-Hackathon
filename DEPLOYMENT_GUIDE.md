@@ -48,8 +48,8 @@ git push origin main
 - **Region:** Choose closest to you (e.g., `Oregon (US West)`)
 - **Branch:** `main` (or your default branch)
 - **Root Directory:** `backend` (important!)
-- **Runtime:** `Python 3`
-- **Build Command:** `pip install -r requirements.txt`
+- **Runtime:** `Python 3.11` (or use `runtime.txt` in backend folder)
+- **Build Command:** `pip install --upgrade pip setuptools wheel && pip install -r requirements.txt`
 - **Start Command:** `gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120`
 
 **Environment Variables:**

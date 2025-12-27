@@ -14,7 +14,10 @@
   NODE_VERSION = "18"
   # Explicitly tell Netlify to skip Python
   PYTHON_VERSION = ""
+  # Disable Python detection
+  SKIP_PYTHON = "true"
 
 [context.production.environment]
   NODE_VERSION = "18"
   PYTHON_VERSION = ""
+  SKIP_PYTHON = "true"
