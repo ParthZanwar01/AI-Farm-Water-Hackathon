@@ -13,7 +13,9 @@ if (!apiUrl) {
     console.warn('⚠️  REACT_APP_API_URL not set. Using default /api');
 }
 
-const htmlPath = path.join(__dirname, '..', '..', 'frontend', 'index.html');
+// Get the frontend path - handle both local and Netlify build contexts
+const projectRoot = process.env.PROJECT_ROOT || path.join(__dirname, '..', '..');
+const htmlPath = path.join(projectRoot, 'frontend', 'index.html');
 
 if (fs.existsSync(htmlPath)) {
     let html = fs.readFileSync(htmlPath, 'utf8');

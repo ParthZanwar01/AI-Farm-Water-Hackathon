@@ -99,7 +99,7 @@ You should get a JSON response.
 
 **Build Settings:**
 - **Base directory:** Leave empty
-- **Build command:** `node backend/scripts/inject_api_url.js`
+- **Build command:** `echo 'Frontend build - static files only'` (or leave empty)
 - **Publish directory:** `frontend`
 
 ### 3.3 Set Environment Variables

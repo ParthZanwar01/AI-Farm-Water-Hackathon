@@ -29,3 +29,6 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# Netlify - ignore Python runtime for frontend
+runtime.txt

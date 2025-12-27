@@ -4,8 +4,8 @@
 // For Netlify: Set REACT_APP_API_URL environment variable in Netlify dashboard
 // Format: https://your-render-app.onrender.com/api
 const getApiBase = () => {
-    // Check for window variable (injected by build script)
-    if (window.API_BASE_URL) {
+    // Check for window variable (injected by Netlify build or HTML script tag)
+    if (window.API_BASE_URL && window.API_BASE_URL !== '%REACT_APP_API_URL%' && window.API_BASE_URL.startsWith('http')) {
         return window.API_BASE_URL;
     }
     

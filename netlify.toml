@@ -1,6 +1,7 @@
 [build]
   publish = "frontend"
-  command = "node backend/scripts/inject_api_url.js"
+  # Simple shell script to inject API URL (no Python/Node.js needed)
+  command = "bash build.sh"
 
 [[redirects]]
   from = "/*"
@@ -10,4 +11,10 @@
 [build.environment]
   # This will be set in Netlify dashboard
   REACT_APP_API_URL = "https://your-render-app.onrender.com/api"
+  NODE_VERSION = "18"
+  # Explicitly tell Netlify to skip Python
+  PYTHON_VERSION = ""
 
+[context.production.environment]
+  NODE_VERSION = "18"
+  PYTHON_VERSION = ""
