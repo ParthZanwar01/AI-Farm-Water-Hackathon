@@ -48,19 +48,29 @@ git push origin main
 - **Region:** Choose closest to you (e.g., `Oregon (US West)`)
 - **Branch:** `main` (or your default branch)
 - **Root Directory:** `backend` (important!)
-- **Runtime:** `Python 3.11` (IMPORTANT: Select Python 3.11, NOT 3.13!)
-- **Build Command:** `bash build.sh` (or `pip install --upgrade pip setuptools wheel && pip install -r requirements.txt`)
+- **Runtime:** ⚠️ **CRITICAL - Select "Python 3.11" (NOT 3.13!)** ⚠️
+- **Build Command:** `bash build.sh`
 - **Start Command:** `gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120`
 
-**⚠️ CRITICAL:** If you see Python 3.13 in the build logs:
-1. Go to **Settings** → **Environment**
-2. Manually change **Python Version** to **3.11**
-3. Save and redeploy
+**🚨 IF YOU ALREADY CREATED THE SERVICE WITH PYTHON 3.13:**
+
+1. Go to your service dashboard
+2. Click **"Settings"** tab
+3. Scroll to **"Environment"** section
+4. Find **"Python Version"** dropdown
+5. **Change from "Python 3.13" to "Python 3.11"**
+6. Click **"Save Changes"**
+7. Go to **"Manual Deploy"** tab
+8. Click **"Clear build cache & deploy"**
+9. Wait for deployment
+
+**The build script will now fail fast if Python 3.13 is detected and tell you exactly what to do.**
 
 **Environment Variables:**
 Click **"Advanced"** → **"Add Environment Variable"** and add:
 
 ```
+PYTHON_VERSION = 3.11.11
 OPENBLAS_NUM_THREADS = 1
 OMP_NUM_THREADS = 1
 MKL_NUM_THREADS = 1
@@ -69,6 +79,8 @@ NUMEXPR_NUM_THREADS = 1
 FLASK_ENV = production
 PORT = (leave empty - Render sets this automatically)
 ```
+
+**⚠️ IMPORTANT:** The `PYTHON_VERSION` environment variable is the easiest way to set Python version if you can't find the runtime setting!
 
 ### 2.3 Deploy
 
