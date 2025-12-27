@@ -1,6 +1,6 @@
 [build]
   publish = "frontend"
-  command = "node scripts/inject_api_url.js"
+  command = "node backend/scripts/inject_api_url.js"
 
 [[redirects]]
   from = "/*"

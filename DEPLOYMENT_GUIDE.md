@@ -47,7 +47,7 @@ git push origin main
 - **Name:** `ai-farm-water-backend` (or any name you prefer)
 - **Region:** Choose closest to you (e.g., `Oregon (US West)`)
 - **Branch:** `main` (or your default branch)
-- **Root Directory:** Leave empty (root of repo)
+- **Root Directory:** `backend` (important!)
 - **Runtime:** `Python 3`
 - **Build Command:** `pip install -r requirements.txt`
 - **Start Command:** `gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120`
@@ -99,7 +99,7 @@ You should get a JSON response.
 
 **Build Settings:**
 - **Base directory:** Leave empty
-- **Build command:** Leave empty (or `echo "No build needed"`)
+- **Build command:** `node backend/scripts/inject_api_url.js`
 - **Publish directory:** `frontend`
 
 ### 3.3 Set Environment Variables
