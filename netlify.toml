@@ -9,8 +9,8 @@
   status = 200
 
 [build.environment]
-  # This will be set in Netlify dashboard
-  REACT_APP_API_URL = "https://your-render-app.onrender.com/api"
+  # Backend API URL - Update this if your Render URL changes
+  REACT_APP_API_URL = "https://ai-farm-water-hackathon.onrender.com/api"
   NODE_VERSION = "18"
   # Explicitly tell Netlify to skip Python
   PYTHON_VERSION = ""
