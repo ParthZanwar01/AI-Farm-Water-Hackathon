@@ -1,6 +1,9 @@
 // Frontend JavaScript for AI Farm Water Management System
 
-const API_BASE = 'http://localhost:5001/api';
+// Use relative URL for production, localhost for development
+const API_BASE = window.location.hostname === 'localhost' 
+    ? 'http://localhost:5001/api' 
+    : '/api';
 let updateInterval = null;
 let simulationActive = false;
 

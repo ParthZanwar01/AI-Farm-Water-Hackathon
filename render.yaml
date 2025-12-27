@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: ai-farm-water
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120
+    envVars:
+      - key: OPENBLAS_NUM_THREADS
+        value: 1
+      - key: OMP_NUM_THREADS
+        value: 1
+      - key: MKL_NUM_THREADS
+        value: 1
+      - key: VECLIB_MAXIMUM_THREADS
+        value: 1
+      - key: NUMEXPR_NUM_THREADS
+        value: 1
+      - key: FLASK_ENV
+        value: production
+

@@ -365,7 +365,11 @@ if __name__ == '__main__':
     # Create data directory if it doesn't exist
     os.makedirs('data', exist_ok=True)
     
-    print("Starting AI Farm Water Management System...")
-    print("Access the frontend at: http://localhost:5001")
+    # Get port from environment variable (for production) or use 5001 (for local)
+    port = int(os.environ.get('PORT', 5001))
+    debug = os.environ.get('FLASK_ENV') != 'production'
     
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    print("Starting AI Farm Water Management System...")
+    print(f"Access the frontend at: http://localhost:{port}")
+    
+    app.run(debug=debug, host='0.0.0.0', port=port)
