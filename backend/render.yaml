@@ -3,8 +3,7 @@ services:
     name: ai-farm-water
     env: python
     rootDir: backend
-    pythonVersion: "3.11.9"
-    buildCommand: python -m pip install --upgrade pip setuptools wheel && python -m pip install -r requirements.txt
+    buildCommand: bash build.sh
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120
     envVars:
       - key: OPENBLAS_NUM_THREADS

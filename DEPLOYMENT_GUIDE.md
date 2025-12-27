@@ -49,8 +49,13 @@ git push origin main
 - **Branch:** `main` (or your default branch)
 - **Root Directory:** `backend` (important!)
 - **Runtime:** `Python 3.11` (IMPORTANT: Select Python 3.11, NOT 3.13!)
-- **Build Command:** `python -m pip install --upgrade pip setuptools wheel && python -m pip install -r requirements.txt`
+- **Build Command:** `bash build.sh` (or `pip install --upgrade pip setuptools wheel && pip install -r requirements.txt`)
 - **Start Command:** `gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120`
+
+**⚠️ CRITICAL:** If you see Python 3.13 in the build logs:
+1. Go to **Settings** → **Environment**
+2. Manually change **Python Version** to **3.11**
+3. Save and redeploy
 
 **Environment Variables:**
 Click **"Advanced"** → **"Add Environment Variable"** and add:
