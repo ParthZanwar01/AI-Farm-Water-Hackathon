@@ -273,6 +273,17 @@ class HeatSpikePredictor:
     
     def train(self, force_retrain=False):
         """Train the dual models on historical data"""
+        # Check if model is already trained and data hasn't changed
+        if not force_retrain and self.is_trained:
+            # Check if data file exists and get its modification time
+            if os.path.exists(self.data_file):
+                import time
+                file_mtime = os.path.getmtime(self.data_file)
+                # If model was trained after data was last modified, skip retraining
+                if hasattr(self, '_last_train_time') and self._last_train_time > file_mtime:
+                    print("Model is already trained and data hasn't changed. Use force_retrain=True to retrain.")
+                    return
+        
         df = self._load_data()
         
         # Auto-seed if empty
@@ -287,6 +298,39 @@ class HeatSpikePredictor:
         if len(df) < 100:
             self.is_trained = False
             return
+        
+        # Clean and optimize data BEFORE feature creation (much faster!)
+        print(f"Cleaning and optimizing dataset ({len(df):,} records)...")
+        original_len = len(df)
+        
+        # Remove duplicates first (fastest operation)
+        df = df.drop_duplicates(subset=['timestamp', 'server_area'], keep='last')
+        print(f"  • Removed {original_len - len(df):,} duplicates")
+        
+        # Remove outliers (temperatures outside realistic server range)
+        before_outliers = len(df)
+        df = df[(df['temperature'] >= 50) & (df['temperature'] <= 120)]
+        print(f"  • Removed {before_outliers - len(df):,} outliers")
+        
+        # Sort by timestamp for efficient processing
+        df = df.sort_values(['server_area', 'timestamp']).reset_index(drop=True)
+        
+        # For very large datasets, use intelligent sampling BEFORE feature creation
+        if len(df) > 100000:
+            # Keep all recent data (last 30 days) and sample older data
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+            cutoff_date = df['timestamp'].max() - pd.Timedelta(days=30)
+            recent_data = df[df['timestamp'] >= cutoff_date]
+            old_data = df[df['timestamp'] < cutoff_date]
+            
+            # Sample old data to keep it manageable
+            if len(old_data) > 50000:
+                old_data = old_data.sample(n=50000, random_state=42)
+            
+            df = pd.concat([recent_data, old_data]).sort_values(['server_area', 'timestamp']).reset_index(drop=True)
+            print(f"  • Sampled to {len(df):,} records (kept all recent + sampled older data)")
+        
+        print(f"✓ Cleaned dataset: {len(df):,} records ready for training")
         
         print("Preprocessing data and creating enhanced features...")
         df = self._create_features(df)
@@ -365,6 +409,10 @@ class HeatSpikePredictor:
         
         self.is_trained = True
         self.feature_cols = available_features
+        
+        # Record training time
+        import time
+        self._last_train_time = time.time()
         
         print(f"\n✓ Models trained on {len(df)} samples with {len(available_features)} features.")
         

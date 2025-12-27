@@ -1,0 +1,13 @@
+[build]
+  publish = "frontend"
+  command = "node scripts/inject_api_url.js"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  # This will be set in Netlify dashboard
+  REACT_APP_API_URL = "https://your-render-app.onrender.com/api"
+

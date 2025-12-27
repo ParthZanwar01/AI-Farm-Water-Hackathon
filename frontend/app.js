@@ -1,9 +1,32 @@
 // Frontend JavaScript for AI Farm Water Management System
 
-// Use relative URL for production, localhost for development
-const API_BASE = window.location.hostname === 'localhost' 
-    ? 'http://localhost:5001/api' 
-    : '/api';
+// API Base URL - supports both localhost and deployed environments
+// For Netlify: Set REACT_APP_API_URL environment variable in Netlify dashboard
+// Format: https://your-render-app.onrender.com/api
+const getApiBase = () => {
+    // Check for window variable (injected by build script)
+    if (window.API_BASE_URL) {
+        return window.API_BASE_URL;
+    }
+    
+    // Localhost development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:5001/api';
+    }
+    
+    // Production: Check for meta tag (set during build)
+    const metaApiUrl = document.querySelector('meta[name="api-url"]')?.getAttribute('content');
+    if (metaApiUrl && metaApiUrl !== '%REACT_APP_API_URL%' && metaApiUrl.startsWith('http')) {
+        return metaApiUrl;
+    }
+    
+    // Fallback: Use relative path (won't work for cross-origin)
+    // In production, you MUST set REACT_APP_API_URL in Netlify
+    console.warn('⚠️ API URL not configured. Set REACT_APP_API_URL in Netlify environment variables.');
+    return '/api';
+};
+
+const API_BASE = getApiBase();
 let updateInterval = null;
 let simulationActive = false;
 
@@ -320,18 +343,91 @@ function updateStatusUI(isRunning) {
 }
 
 async function retrainModel() {
+    const btn = document.getElementById('retrainModel');
+    const originalText = btn.innerHTML;
+    const originalDisabled = btn.disabled;
+    
+    // Show loading state
+    btn.disabled = true;
+    btn.innerHTML = '🔄 Training...';
+    
+    // Create progress indicator
+    const progressDiv = document.createElement('div');
+    progressDiv.id = 'retrainProgress';
+    progressDiv.style.cssText = 'margin-top: 10px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; display: none;';
+    progressDiv.innerHTML = `
+        <div style="margin-bottom: 10px;">
+            <strong style="color: var(--text-primary);">🔄 Training Model...</strong>
+            <div style="margin-top: 8px; background: var(--bg-darker); border-radius: 10px; height: 24px; overflow: hidden; position: relative; border: 1px solid var(--border-color);">
+                <div id="progressBar" style="background: linear-gradient(90deg, #3b82f6, #06b6d4); height: 100%; width: 0%; transition: width 0.3s; border-radius: 10px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);"></div>
+                <div id="progressText" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: bold; color: var(--text-primary); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">0%</div>
+            </div>
+        </div>
+        <div id="progressStatus" style="font-size: 13px; color: var(--text-secondary);">Initializing...</div>
+    `;
+    
+    // Insert progress indicator after button
+    btn.parentNode.insertBefore(progressDiv, btn.nextSibling);
+    progressDiv.style.display = 'block';
+    
+    // Simulate progress (since we can't get real-time updates from backend)
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        progress = Math.min(progress + Math.random() * 15, 95);
+        document.getElementById('progressBar').style.width = progress + '%';
+        document.getElementById('progressText').textContent = Math.round(progress) + '%';
+        
+        const statuses = [
+            'Loading dataset...',
+            'Creating features...',
+            'Training temperature model...',
+            'Training spike classifier...',
+            'Evaluating performance...',
+            'Finalizing...'
+        ];
+        const statusIndex = Math.floor((progress / 100) * statuses.length);
+        document.getElementById('progressStatus').textContent = statuses[statusIndex] || 'Almost done...';
+    }, 500);
+    
     try {
         const response = await fetch(`${API_BASE}/model/retrain`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
         const data = await response.json();
+        
+        clearInterval(progressInterval);
+        document.getElementById('progressBar').style.width = '100%';
+        document.getElementById('progressText').textContent = '100%';
+        document.getElementById('progressStatus').textContent = '✓ Training complete!';
+        
         if (data.status === 'retrained') {
-            const btn = document.getElementById('retrainModel');
-            const originalText = btn.innerHTML;
             btn.innerHTML = '✔ Done';
-            setTimeout(() => btn.innerHTML = originalText, 2000);
+            btn.style.background = '#4CAF50';
+            
+            setTimeout(() => {
+                progressDiv.style.display = 'none';
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+                btn.disabled = originalDisabled;
+            }, 3000);
+        } else {
+            throw new Error(data.message || 'Training failed');
         }
+    } catch (error) {
+        clearInterval(progressInterval);
+        document.getElementById('progressBar').style.background = '#f44336';
+        document.getElementById('progressStatus').textContent = '❌ Error: ' + error.message;
+        btn.innerHTML = '❌ Failed';
+        btn.style.background = '#f44336';
+        
+        setTimeout(() => {
+            progressDiv.style.display = 'none';
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+            btn.disabled = originalDisabled;
+        }, 5000);
+    }
     } catch (error) {
         console.error('Error retraining model:', error);
     }

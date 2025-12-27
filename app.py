@@ -12,6 +12,7 @@ os.environ.setdefault('NUMEXPR_NUM_THREADS', '1')
 
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
+import os
 from datetime import datetime
 import random
 import threading
@@ -21,7 +22,15 @@ import numpy as np
 from models.heat_predictor import HeatSpikePredictor
 
 app = Flask(__name__, static_folder='frontend')
-CORS(app)
+
+# Configure CORS - allow requests from Netlify and localhost
+# In production, allow all origins (Netlify URLs can vary)
+# You can restrict this if needed for security
+if os.environ.get('FLASK_ENV') == 'production':
+    CORS(app, origins="*", supports_credentials=True)
+else:
+    # Development: allow all origins
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Helper to sanitize JSON response
 def sanitize_float(val):
@@ -348,8 +357,114 @@ def trigger_spike():
 @app.route('/api/model/retrain', methods=['POST'])
 def retrain_model():
     """Retrain the ML model"""
-    predictor.train(force_retrain=True)
-    return jsonify({'status': 'retrained', 'message': 'Model retrained successfully'})
+    try:
+        import time
+        start_time = time.time()
+        
+        # Train the model
+        predictor.train(force_retrain=True)
+        
+        train_time = time.time() - start_time
+        metrics = predictor.get_model_metrics()
+        
+        return jsonify({
+            'status': 'retrained', 
+            'message': 'Model retrained successfully',
+            'training_time': round(train_time, 2),
+            'metrics': metrics
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@app.route('/api/data/fetch-online', methods=['POST'])
+def fetch_online_data():
+    """Fetch and integrate online datasets"""
+    try:
+        import pandas as pd
+        import requests
+        from io import StringIO
+        from datetime import datetime, timedelta
+        
+        data = request.json or {}
+        url = data.get('url')
+        
+        if not url:
+            return jsonify({'status': 'error', 'message': 'Missing URL'}), 400
+        
+        # Fetch data
+        response = requests.get(url, timeout=30)
+        if response.status_code != 200:
+            return jsonify({'status': 'error', 'message': f'HTTP {response.status_code}'}), 400
+        
+        df = pd.read_csv(StringIO(response.text))
+        if df.empty:
+            return jsonify({'status': 'error', 'message': 'Empty dataset'}), 400
+        
+        # Transform to server format
+        # Find temperature column
+        temp_cols = [c for c in df.columns if 'temp' in c.lower()]
+        if not temp_cols:
+            return jsonify({'status': 'error', 'message': 'No temperature column found'}), 400
+        
+        temp_col = temp_cols[0]
+        time_cols = [c for c in df.columns if any(x in c.lower() for x in ['time', 'date', 'timestamp'])]
+        time_col = time_cols[0] if time_cols else None
+        
+        # Build transformed dataframe
+        transformed = pd.DataFrame()
+        
+        if time_col:
+            transformed['timestamp'] = pd.to_datetime(df[time_col], errors='coerce')
+        else:
+            start = datetime.now() - timedelta(days=len(df)/144)
+            transformed['timestamp'] = pd.date_range(start=start, periods=len(df), freq='10min')
+        
+        transformed = transformed.dropna(subset=['timestamp'])
+        
+        temps = pd.to_numeric(df[temp_col], errors='coerce')
+        if temps.max() > 50:  # Likely Celsius
+            temps = (temps * 9/5) + 32
+        
+        transformed['temperature'] = temps
+        transformed = transformed.dropna(subset=['temperature'])
+        transformed = transformed[(transformed['temperature'] >= 50) & (transformed['temperature'] <= 120)]
+        
+        transformed['server_area'] = (transformed.index % 24).astype(int)
+        transformed['time_of_day'] = transformed['timestamp'].dt.hour
+        transformed['day_of_week'] = transformed['timestamp'].dt.weekday
+        
+        final = transformed[['timestamp', 'server_area', 'temperature', 'time_of_day', 'day_of_week']].copy()
+        final = final.sort_values('timestamp').reset_index(drop=True)
+        
+        if final.empty:
+            return jsonify({'status': 'error', 'message': 'No valid data after transformation'}), 400
+        
+        # Merge with existing
+        data_path = 'data/heat_spikes.csv'
+        if os.path.exists(data_path):
+            existing = pd.read_csv(data_path)
+            existing['timestamp'] = pd.to_datetime(existing['timestamp'])
+            final['timestamp'] = pd.to_datetime(final['timestamp'])
+            combined = pd.concat([existing, final], ignore_index=True)
+            combined = combined.drop_duplicates(subset=['timestamp', 'server_area'], keep='last')
+            combined = combined.sort_values('timestamp').reset_index(drop=True)
+        else:
+            combined = final
+        
+        os.makedirs('data', exist_ok=True)
+        combined.to_csv(data_path, index=False)
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Dataset integrated successfully',
+            'records_added': len(final),
+            'total_records': len(combined)
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/')
 def index():
