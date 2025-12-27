@@ -43,7 +43,30 @@ def sanitize_dict(d):
 
 # Initialize the ML predictor
 predictor = HeatSpikePredictor()
-predictor.train()
+
+# Train model in background to avoid blocking startup on Render
+# Model training can take time with large datasets, so we do it async
+def train_model_async():
+    try:
+        print("🤖 Starting ML model training in background...")
+        predictor.train()
+        print("✅ ML model training completed successfully")
+    except Exception as e:
+        print(f"⚠️  Model training failed (app will continue): {e}")
+        import traceback
+        traceback.print_exc()
+
+# Start training in background thread (non-blocking)
+# This allows gunicorn to start immediately while model trains
+if os.environ.get('FLASK_ENV') == 'production':
+    # In production, train async to avoid blocking gunicorn startup
+    training_thread = threading.Thread(target=train_model_async, daemon=True)
+    training_thread.start()
+    print("🚀 Flask app ready, model training in background...")
+else:
+    # In development, train synchronously for easier debugging
+    print("Training model synchronously (development mode)...")
+    predictor.train()
 
 # Simulated server state (24 server areas)
 server_state = {
