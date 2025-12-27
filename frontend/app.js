@@ -428,9 +428,6 @@ async function retrainModel() {
             btn.disabled = originalDisabled;
         }, 5000);
     }
-    } catch (error) {
-        console.error('Error retraining model:', error);
-    }
 }
 
 function startStatusUpdates() {
