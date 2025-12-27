@@ -27,7 +27,15 @@ app = Flask(__name__, static_folder='../frontend')
 # In production, allow all origins (Netlify URLs can vary)
 # You can restrict this if needed for security
 if os.environ.get('FLASK_ENV') == 'production':
-    CORS(app, origins="*", supports_credentials=True)
+    # Production: Allow all origins (Netlify URLs can vary)
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": "*",
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }
+    })
 else:
     # Development: allow all origins
     CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -193,6 +201,15 @@ def simulation_loop():
                     area['current_temp'] += random.uniform(0.1, 0.3)
         
         time.sleep(1)  # Faster updates (1s)
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Simple health check endpoint"""
+    return jsonify({
+        'status': 'ok',
+        'service': 'AI Farm Water Management System',
+        'timestamp': datetime.now().isoformat()
+    }), 200
 
 @app.route('/api/status', methods=['GET'])
 def get_status():
