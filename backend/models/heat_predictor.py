@@ -109,11 +109,25 @@ class HeatSpikePredictor:
         
     def _load_data(self):
         """Load historical heat spike data"""
-        if os.path.exists(self.data_file):
-            df = pd.read_csv(self.data_file)
-            df['timestamp'] = pd.to_datetime(df['timestamp'])
-            return df
-        return pd.DataFrame(columns=['timestamp', 'server_area', 'temperature', 'time_of_day', 'day_of_week'])
+        try:
+            if os.path.exists(self.data_file):
+                df = pd.read_csv(self.data_file)
+                # Handle empty CSV files
+                if df.empty:
+                    return pd.DataFrame(columns=['timestamp', 'server_area', 'temperature', 'time_of_day', 'day_of_week'])
+                # Convert timestamp column if it exists
+                if 'timestamp' in df.columns:
+                    df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+                    # Drop rows with invalid timestamps
+                    df = df.dropna(subset=['timestamp'])
+                return df
+            return pd.DataFrame(columns=['timestamp', 'server_area', 'temperature', 'time_of_day', 'day_of_week'])
+        except Exception as e:
+            print(f"Error loading data from {self.data_file}: {e}")
+            import traceback
+            traceback.print_exc()
+            # Return empty dataframe on error
+            return pd.DataFrame(columns=['timestamp', 'server_area', 'temperature', 'time_of_day', 'day_of_week'])
     
     def _get_neighbors(self, id):
         """Get list of neighbor IDs (up, down, left, right)"""

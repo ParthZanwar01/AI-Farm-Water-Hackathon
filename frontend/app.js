@@ -609,11 +609,32 @@ function updatePrediction(areaId, prediction) {
 // Update total spikes count
 async function updateTotalSpikes() {
     try {
-        const response = await fetch(`${API_BASE}/history`);
+        const response = await fetch(`${API_BASE}/history`, {
+            signal: AbortSignal.timeout(10000) // 10 second timeout
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
         const data = await response.json();
-        document.getElementById('totalSpikes').textContent = data.length;
+        
+        // Ensure data is an array
+        const count = Array.isArray(data) ? data.length : 0;
+        const totalSpikesEl = document.getElementById('totalSpikes');
+        if (totalSpikesEl) {
+            totalSpikesEl.textContent = count;
+        }
     } catch (error) {
-        console.error('Error fetching history:', error);
+        // Silently fail - don't spam console with errors for non-critical feature
+        if (error.name !== 'AbortError') {
+            console.warn('Error fetching history (non-critical):', error.message);
+        }
+        // Set to 0 or keep previous value on error
+        const totalSpikesEl = document.getElementById('totalSpikes');
+        if (totalSpikesEl && !totalSpikesEl.textContent || totalSpikesEl.textContent === '--') {
+            totalSpikesEl.textContent = '0';
+        }
     }
 }
 

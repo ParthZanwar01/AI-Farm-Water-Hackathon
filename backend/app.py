@@ -382,20 +382,36 @@ def record_heat_spike():
 @app.route('/api/history', methods=['GET'])
 def get_history():
     """Get historical heat spike data"""
-    df = predictor._load_data()
-    
-    # Convert to list of dicts (handle empty dataframe)
-    if df.empty:
-        history = []
-    else:
-        history = df.tail(100).to_dict('records')
-    
-    # Convert datetime to string
-    for record in history:
-        if 'timestamp' in record and pd.notna(record['timestamp']):
-            record['timestamp'] = record['timestamp'].isoformat()
-    
-    return jsonify(history)
+    try:
+        df = predictor._load_data()
+        
+        # Convert to list of dicts (handle empty dataframe)
+        if df.empty:
+            history = []
+        else:
+            history = df.tail(100).to_dict('records')
+        
+        # Convert datetime to string
+        for record in history:
+            if 'timestamp' in record and pd.notna(record['timestamp']):
+                try:
+                    # Handle both datetime objects and strings
+                    if isinstance(record['timestamp'], str):
+                        # Already a string, keep it
+                        pass
+                    else:
+                        record['timestamp'] = record['timestamp'].isoformat()
+                except (AttributeError, ValueError) as e:
+                    # If conversion fails, set to None or current time
+                    record['timestamp'] = datetime.now().isoformat()
+        
+        return jsonify(history)
+    except Exception as e:
+        print(f"Error in get_history: {e}")
+        import traceback
+        traceback.print_exc()
+        # Return empty history on error instead of crashing
+        return jsonify([])
 
 @app.route('/api/cooling/activate', methods=['POST'])
 def activate_cooling():
