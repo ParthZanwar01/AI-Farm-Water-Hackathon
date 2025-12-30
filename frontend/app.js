@@ -51,6 +51,28 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleAutoSpikes(e.target.checked);
         });
     }
+
+    // Dismiss loading notice
+    const dismissBtn = document.getElementById('dismissNotice');
+    const loadingNotice = document.getElementById('loadingNotice');
+    const appContainer = document.querySelector('.app-container');
+    
+    if (dismissBtn && loadingNotice) {
+        dismissBtn.addEventListener('click', () => {
+            loadingNotice.classList.add('hidden');
+            appContainer.classList.remove('with-notice');
+            setTimeout(() => {
+                loadingNotice.style.display = 'none';
+            }, 300);
+        });
+
+        // Auto-hide after 10 seconds
+        setTimeout(() => {
+            if (loadingNotice && !loadingNotice.classList.contains('hidden')) {
+                dismissBtn.click();
+            }
+        }, 10000);
+    }
 });
 
 let currentSystemMode = 'standard';
@@ -256,7 +278,10 @@ function createServerControls(id) {
 function setupEventListeners() {
     document.getElementById('startSim').addEventListener('click', startSimulation);
     document.getElementById('stopSim').addEventListener('click', stopSimulation);
-    document.getElementById('retrainModel').addEventListener('click', retrainModel);
+    const pauseBtn = document.getElementById('pauseSim');
+    const stepBtn = document.getElementById('stepSim');
+    if (pauseBtn) pauseBtn.addEventListener('click', pauseSimulation);
+    if (stepBtn) stepBtn.addEventListener('click', stepSimulation);
     document.getElementById('triggerSpike').addEventListener('click', triggerHeatSpike);
 }
 
@@ -281,7 +306,8 @@ async function startSimulation() {
         const data = await response.json();
         if (data.status) {
             simulationActive = true;
-            updateStatusUI(true);
+            simulationPaused = false;
+            updateStatusUI(true, false);
         }
     } catch (error) {
         console.error('Error starting simulation:', error);
@@ -297,136 +323,85 @@ async function stopSimulation() {
         const data = await response.json();
         if (data.status) {
             simulationActive = false;
-            updateStatusUI(false);
+            simulationPaused = false;
+            updateStatusUI(false, false);
         }
     } catch (error) {
         console.error('Error stopping simulation:', error);
     }
 }
 
-function updateStatusUI(isRunning) {
+function updateStatusUI(isRunning, isPaused) {
     const statusEl = document.getElementById('simStatus');
     const startBtn = document.getElementById('startSim');
     const stopBtn = document.getElementById('stopSim');
+    const pauseBtn = document.getElementById('pauseSim');
+    const stepBtn = document.getElementById('stepSim');
 
     if (isRunning) {
-        statusEl.textContent = 'Running';
-        statusEl.className = 'status-badge running';
-
-        // Disable Start, Enable Stop
-        if (startBtn) {
-            startBtn.disabled = true;
-            startBtn.style.opacity = '0.5';
-            startBtn.style.cursor = 'not-allowed';
-        }
-        if (stopBtn) {
-            stopBtn.disabled = false;
-            stopBtn.style.opacity = '1';
-            stopBtn.style.cursor = 'pointer';
+        if (isPaused) {
+            statusEl.textContent = 'Paused';
+            statusEl.className = 'status-badge paused';
+            
+            // Show pause and step buttons, hide start/stop
+            if (pauseBtn) {
+                pauseBtn.style.display = 'none';
+            }
+            if (stepBtn) {
+                stepBtn.style.display = 'flex';
+                stepBtn.disabled = false;
+                stepBtn.style.opacity = '1';
+            }
+            if (startBtn) {
+                startBtn.style.display = 'none';
+            }
+            if (stopBtn) {
+                stopBtn.style.display = 'flex';
+                stopBtn.disabled = false;
+                stopBtn.style.opacity = '1';
+            }
+        } else {
+            statusEl.textContent = 'Running';
+            statusEl.className = 'status-badge running';
+            
+            // Show pause button, hide step button
+            if (pauseBtn) {
+                pauseBtn.style.display = 'flex';
+                pauseBtn.disabled = false;
+                pauseBtn.style.opacity = '1';
+            }
+            if (stepBtn) {
+                stepBtn.style.display = 'none';
+            }
+            if (startBtn) {
+                startBtn.style.display = 'none';
+            }
+            if (stopBtn) {
+                stopBtn.style.display = 'flex';
+                stopBtn.disabled = false;
+                stopBtn.style.opacity = '1';
+            }
         }
     } else {
         statusEl.textContent = 'Stopped';
         statusEl.className = 'status-badge stopped';
 
-        // Enable Start, Disable Stop
+        // Show start button, hide pause/step/stop
         if (startBtn) {
+            startBtn.style.display = 'flex';
             startBtn.disabled = false;
             startBtn.style.opacity = '1';
             startBtn.style.cursor = 'pointer';
         }
         if (stopBtn) {
-            stopBtn.disabled = true;
-            stopBtn.style.opacity = '0.5';
-            stopBtn.style.cursor = 'not-allowed';
+            stopBtn.style.display = 'none';
         }
-    }
-}
-
-async function retrainModel() {
-    const btn = document.getElementById('retrainModel');
-    const originalText = btn.innerHTML;
-    const originalDisabled = btn.disabled;
-    
-    // Show loading state
-    btn.disabled = true;
-    btn.innerHTML = '🔄 Training...';
-    
-    // Create progress indicator
-    const progressDiv = document.createElement('div');
-    progressDiv.id = 'retrainProgress';
-    progressDiv.style.cssText = 'margin-top: 10px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; display: none;';
-    progressDiv.innerHTML = `
-        <div style="margin-bottom: 10px;">
-            <strong style="color: var(--text-primary);">🔄 Training Model...</strong>
-            <div style="margin-top: 8px; background: var(--bg-darker); border-radius: 10px; height: 24px; overflow: hidden; position: relative; border: 1px solid var(--border-color);">
-                <div id="progressBar" style="background: linear-gradient(90deg, #3b82f6, #06b6d4); height: 100%; width: 0%; transition: width 0.3s; border-radius: 10px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);"></div>
-                <div id="progressText" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: bold; color: var(--text-primary); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">0%</div>
-            </div>
-        </div>
-        <div id="progressStatus" style="font-size: 13px; color: var(--text-secondary);">Initializing...</div>
-    `;
-    
-    // Insert progress indicator after button
-    btn.parentNode.insertBefore(progressDiv, btn.nextSibling);
-    progressDiv.style.display = 'block';
-    
-    // Simulate progress (since we can't get real-time updates from backend)
-    let progress = 0;
-    const progressInterval = setInterval(() => {
-        progress = Math.min(progress + Math.random() * 15, 95);
-        document.getElementById('progressBar').style.width = progress + '%';
-        document.getElementById('progressText').textContent = Math.round(progress) + '%';
-        
-        const statuses = [
-            'Loading dataset...',
-            'Creating features...',
-            'Training temperature model...',
-            'Training spike classifier...',
-            'Evaluating performance...',
-            'Finalizing...'
-        ];
-        const statusIndex = Math.floor((progress / 100) * statuses.length);
-        document.getElementById('progressStatus').textContent = statuses[statusIndex] || 'Almost done...';
-    }, 500);
-    
-    try {
-        const response = await fetch(`${API_BASE}/model/retrain`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-        
-        clearInterval(progressInterval);
-        document.getElementById('progressBar').style.width = '100%';
-        document.getElementById('progressText').textContent = '100%';
-        document.getElementById('progressStatus').textContent = '✓ Training complete!';
-        
-        if (data.status === 'retrained') {
-            btn.innerHTML = '✔ Done';
-            btn.style.background = '#4CAF50';
-            
-            setTimeout(() => {
-                progressDiv.style.display = 'none';
-                btn.innerHTML = originalText;
-                btn.style.background = '';
-                btn.disabled = originalDisabled;
-            }, 3000);
-        } else {
-            throw new Error(data.message || 'Training failed');
+        if (pauseBtn) {
+            pauseBtn.style.display = 'none';
         }
-    } catch (error) {
-        clearInterval(progressInterval);
-        document.getElementById('progressBar').style.background = '#f44336';
-        document.getElementById('progressStatus').textContent = '❌ Error: ' + error.message;
-        btn.innerHTML = '❌ Failed';
-        btn.style.background = '#f44336';
-        
-        setTimeout(() => {
-            progressDiv.style.display = 'none';
-            btn.innerHTML = originalText;
-            btn.style.background = '';
-            btn.disabled = originalDisabled;
-        }, 5000);
+        if (stepBtn) {
+            stepBtn.style.display = 'none';
+        }
     }
 }
 
@@ -437,8 +412,48 @@ function startStatusUpdates() {
 
 async function updateStatus() {
     try {
-        const response = await fetch(`${API_BASE}/status`);
+        // Check backend health first
+        try {
+            const healthCheck = await fetch(`${API_BASE}/health`, { 
+                method: 'GET',
+                signal: AbortSignal.timeout(5000) // 5 second timeout
+            });
+            if (!healthCheck.ok) {
+                throw new Error('Backend not ready');
+            }
+        } catch (e) {
+            console.warn('Backend health check failed, retrying...');
+            // Show loading notice if backend is slow
+            const loadingNotice = document.getElementById('loadingNotice');
+            const appContainer = document.querySelector('.app-container');
+            if (loadingNotice && loadingNotice.style.display === 'none') {
+                loadingNotice.style.display = 'block';
+                loadingNotice.classList.remove('hidden');
+                appContainer.classList.add('with-notice');
+            }
+            return; // Skip this update cycle
+        }
+
+        const response = await fetch(`${API_BASE}/status`, {
+            signal: AbortSignal.timeout(10000) // 10 second timeout
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
         const data = await response.json();
+        
+        // Hide loading notice on successful connection
+        const loadingNotice = document.getElementById('loadingNotice');
+        const appContainer = document.querySelector('.app-container');
+        if (loadingNotice && !loadingNotice.classList.contains('hidden')) {
+            setTimeout(() => {
+                if (loadingNotice && document.getElementById('dismissNotice')) {
+                    document.getElementById('dismissNotice').click();
+                }
+            }, 2000);
+        }
 
         let activeCoolingCount = 0;
 
@@ -458,9 +473,10 @@ async function updateStatus() {
         });
 
         // Update simulation status
-        if (data.simulation_active !== simulationActive) {
+        if (data.simulation_active !== simulationActive || data.simulation_paused !== simulationPaused) {
             simulationActive = data.simulation_active;
-            updateStatusUI(simulationActive);
+            simulationPaused = data.simulation_paused || false;
+            updateStatusUI(simulationActive, simulationPaused);
         }
 
         // Update Auto-Spike Toggle State (Sync with Backend)
@@ -480,6 +496,14 @@ async function updateStatus() {
 
     } catch (error) {
         console.error('Error updating status:', error);
+        // Show loading notice on persistent errors
+        const loadingNotice = document.getElementById('loadingNotice');
+        const appContainer = document.querySelector('.app-container');
+        if (loadingNotice && loadingNotice.style.display === 'none') {
+            loadingNotice.style.display = 'block';
+            loadingNotice.classList.remove('hidden');
+            appContainer.classList.add('with-notice');
+        }
     }
 }
 

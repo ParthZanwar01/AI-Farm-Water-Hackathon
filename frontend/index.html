@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Farm | Water Cooling System</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <script>
         // Inject API URL from Netlify environment variable
         window.API_BASE_URL = '%REACT_APP_API_URL%' || (window.location.hostname === 'localhost' ? 'http://localhost:5001/api' : '/api');
@@ -17,6 +18,15 @@
 </head>
 
 <body>
+
+    <!-- Backend Loading Notice -->
+    <div class="loading-notice" id="loadingNotice">
+        <div class="loading-content">
+            <span class="loading-icon">⏳</span>
+            <span class="loading-text">Backend is initializing... Please wait a moment for the server to fully start. This may take 30-60 seconds on first load.</span>
+            <button class="loading-dismiss" id="dismissNotice" aria-label="Dismiss">×</button>
+        </div>
+    </div>
 
     <div class="app-container">
         <!-- Sidebar Navigation -->
@@ -57,11 +67,14 @@
                     <button id="stopSim" class="btn secondary" disabled>
                         <span class="icon">⏹</span> Stop
                     </button>
+                    <button id="pauseSim" class="btn accent" style="display: none;">
+                        <span class="icon">⏸</span> Pause
+                    </button>
+                    <button id="stepSim" class="btn accent" style="display: none;">
+                        <span class="icon">⏭</span> Step Forward
+                    </button>
                     <button id="triggerSpike" class="btn danger">
                         <span class="icon">🔥</span> Trigger Spike
-                    </button>
-                    <button id="retrainModel" class="btn accent">
-                        <span class="icon">🧠</span> Retrain Model
                     </button>
                 </div>
 

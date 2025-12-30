@@ -83,6 +83,7 @@ server_state = {
         for i in range(24)
     ],
     'simulation_active': False,
+    'simulation_paused': False,
     'system_mode': 'standard',  # 'standard' (reactive) or 'ai' (predictive)
     'auto_spikes_enabled': True # Toggle for automatic random spikes
 }
@@ -90,7 +91,14 @@ server_state = {
 # Simulation thread
 simulation_thread = None
 HEAT_TRANSFER_RATE = 0.05
-VULNERABLE_SERVERS = [4, 9, 14, 19]
+
+# Server vulnerability patterns for ML model to learn
+# High vulnerability servers (get 60% of all spikes)
+HIGH_VULNERABLE_SERVERS = [4, 9, 14, 19]
+# Medium vulnerability servers (get 25% of all spikes)
+MEDIUM_VULNERABLE_SERVERS = [1, 6, 11, 16, 21]
+# Low vulnerability servers (get 15% of all spikes - mostly random)
+ALL_SERVERS = list(range(24))
 
 def get_neighbors(id):
     """Get list of neighbor IDs (up, down, left, right)"""
@@ -110,14 +118,53 @@ def get_neighbors(id):
     return neighbors
 
 def generate_random_heat_spike():
-    """Generate a heat spike, favoring vulnerable servers to create a learnable pattern"""
-    # 80% chance it matches our "Vulnerable Server" pattern
-    if random.random() < 0.8:
-        area_id = random.choice(VULNERABLE_SERVERS)
+    """Generate a heat spike with learnable patterns for ML model"""
+    from datetime import datetime
+    current_time = datetime.now()
+    hour = current_time.hour
+    minute = current_time.minute
+    
+    # Pattern 1: High vulnerability servers (60% chance)
+    # These servers are in specific rack positions and get most spikes
+    if random.random() < 0.60:
+        area_id = random.choice(HIGH_VULNERABLE_SERVERS)
+        # Higher temperature spikes for high vulnerability
+        temperature = random.uniform(90, 98)
+    
+    # Pattern 2: Medium vulnerability servers (25% chance)
+    # These are in different positions, create secondary pattern
+    elif random.random() < 0.25:
+        area_id = random.choice(MEDIUM_VULNERABLE_SERVERS)
+        temperature = random.uniform(88, 95)
+    
+    # Pattern 3: Time-based clustering (10% chance)
+    # Spikes tend to cluster around certain hours (business hours pattern)
+    elif random.random() < 0.10:
+        # During business hours (9-17), more likely to hit high vulnerability
+        if 9 <= hour <= 17:
+            area_id = random.choice(HIGH_VULNERABLE_SERVERS + MEDIUM_VULNERABLE_SERVERS)
+            temperature = random.uniform(89, 97)
+        else:
+            # Off-hours, more random but still favor vulnerable
+            if random.random() < 0.7:
+                area_id = random.choice(HIGH_VULNERABLE_SERVERS)
+            else:
+                area_id = random.choice(MEDIUM_VULNERABLE_SERVERS)
+            temperature = random.uniform(87, 94)
+    
+    # Pattern 4: Spatial clustering (5% chance)
+    # When one server spikes, nearby servers are more likely
     else:
-        area_id = random.randint(0, 23)
-        
-    temperature = random.uniform(88, 98)
+        # Check if any high vulnerability server recently spiked
+        # (simplified: just pick a neighbor of a high vulnerability server)
+        base_server = random.choice(HIGH_VULNERABLE_SERVERS)
+        neighbors = get_neighbors(base_server)
+        if neighbors and random.random() < 0.6:
+            area_id = random.choice(neighbors)
+        else:
+            area_id = base_server
+        temperature = random.uniform(86, 93)
+    
     return area_id, temperature
 
 def simulation_loop():
@@ -214,19 +261,45 @@ def health_check():
 @app.route('/api/status', methods=['GET'])
 def get_status():
     """Get current server status and predictions"""
-    predictions = {}
-    
-    for area_id in range(24): # Updated loop for 24 servers
-        prediction = predictor.predict(area_id)
-        predictions[area_id] = prediction
-    
-    return jsonify(sanitize_dict({
-        'areas': server_state['areas'],
-        'predictions': predictions,
-        'simulation_active': server_state['simulation_active'],
-        'system_mode': server_state['system_mode'],
-        'auto_spikes_enabled': server_state['auto_spikes_enabled']
-    }))
+    try:
+        predictions = {}
+        
+        # Get predictions for all 24 servers
+        for area_id in range(24):
+            try:
+                prediction = predictor.predict(area_id)
+                predictions[area_id] = prediction
+            except Exception as e:
+                # If prediction fails for a server, use default values
+                print(f"Warning: Prediction failed for server {area_id}: {e}")
+                predictions[area_id] = {
+                    'predicted_temperature': 70.0,
+                    'spike_probability': 0.1,
+                    'confidence': 0.0
+                }
+        
+        return jsonify(sanitize_dict({
+            'areas': server_state['areas'],
+            'predictions': predictions,
+            'simulation_active': server_state['simulation_active'],
+            'simulation_paused': server_state.get('simulation_paused', False),
+            'system_mode': server_state['system_mode'],
+            'auto_spikes_enabled': server_state['auto_spikes_enabled']
+        }))
+    except Exception as e:
+        print(f"Error in get_status: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'status': 'error',
+            'message': str(e),
+            'areas': server_state['areas'],
+            'predictions': {},
+            'simulation_active': server_state['simulation_active'],
+            'simulation_paused': server_state.get('simulation_paused', False),
+            'system_mode': server_state['system_mode'],
+            'auto_spikes_enabled': server_state['auto_spikes_enabled']
+        }), 500
 
 @app.route('/api/simulation/toggle-spikes', methods=['POST'])
 def toggle_spikes():
@@ -378,7 +451,82 @@ def stop_simulation():
     """Stop the simulation"""
     global server_state
     server_state['simulation_active'] = False
+    server_state['simulation_paused'] = False
     return jsonify({'status': 'stopped', 'message': 'Simulation stopped'})
+
+@app.route('/api/simulation/pause', methods=['POST'])
+def pause_simulation():
+    """Pause the simulation"""
+    global server_state
+    if server_state['simulation_active']:
+        server_state['simulation_paused'] = True
+        return jsonify({'status': 'paused', 'message': 'Simulation paused'})
+    return jsonify({'status': 'error', 'message': 'Simulation not running'}), 400
+
+@app.route('/api/simulation/step', methods=['POST'])
+def step_simulation():
+    """Execute one step of the simulation (when paused)"""
+    global server_state
+    
+    if not server_state['simulation_active']:
+        return jsonify({'status': 'error', 'message': 'Simulation not running'}), 400
+    
+    if not server_state['simulation_paused']:
+        return jsonify({'status': 'error', 'message': 'Simulation not paused'}), 400
+    
+    # Execute one iteration of the simulation loop
+    # Heat spike generation (with learnable patterns)
+    if server_state['auto_spikes_enabled'] and random.random() < 0.20:  # 20% chance
+        area_id, temperature = generate_random_heat_spike()
+        if not server_state['areas'][area_id]['water_active']:
+            server_state['areas'][area_id]['current_temp'] = temperature
+            predictor.record_heat_spike(area_id, temperature)
+    
+    # Heat spread (diffusion)
+    heat_deltas = {i: 0.0 for i in range(24)}
+    for area in server_state['areas']:
+        id = area['id']
+        current_temp = area['current_temp']
+        neighbors = get_neighbors(id)
+        for n_id in neighbors:
+            neighbor_temp = server_state['areas'][n_id]['current_temp']
+            if neighbor_temp > current_temp:
+                diff = neighbor_temp - current_temp
+                heat_deltas[id] += diff * HEAT_TRANSFER_RATE
+    
+    # Apply heat spread
+    for id, delta in heat_deltas.items():
+        if not server_state['areas'][id]['water_active']:
+            server_state['areas'][id]['current_temp'] += delta
+    
+    # Manage cooling & temperature drift
+    for area in server_state['areas']:
+        area_id = area['id']
+        
+        # Auto-cooling logic
+        if server_state['system_mode'] == 'standard':
+            if area['current_temp'] > 85.0 and not area['water_active']:
+                area['water_active'] = True
+        elif server_state['system_mode'] == 'ai':
+            pred = predictor.predict(area_id)
+            predictive_trigger = pred['spike_probability'] > 0.7
+            failsafe_trigger = area['current_temp'] > 85.0
+            if (predictive_trigger or failsafe_trigger) and not area['water_active']:
+                area['water_active'] = True
+        
+        # Physics
+        if area['water_active']:
+            area['current_temp'] = max(65, area['current_temp'] - random.uniform(2.0, 4.0))
+            if area['current_temp'] <= 68.0:
+                area['water_active'] = False
+        else:
+            target_temp = 72.0 + random.uniform(-1, 1)
+            if area['current_temp'] > target_temp:
+                area['current_temp'] -= random.uniform(0.1, 0.3)
+            elif area['current_temp'] < target_temp:
+                area['current_temp'] += random.uniform(0.1, 0.3)
+    
+    return jsonify({'status': 'stepped', 'message': 'Simulation stepped forward'})
 
 @app.route('/api/simulation/trigger-spike', methods=['POST'])
 def trigger_spike():
@@ -405,7 +553,7 @@ def retrain_model():
         predictor.train(force_retrain=True)
         
         train_time = time.time() - start_time
-        metrics = predictor.get_model_metrics()
+        metrics = predictor.get_metrics()
         
         return jsonify({
             'status': 'retrained', 

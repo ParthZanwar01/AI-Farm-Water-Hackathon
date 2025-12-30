@@ -56,3 +56,4 @@ python app.py
 - `GET /api/history` - Get historical heat spike data
 
 
+
