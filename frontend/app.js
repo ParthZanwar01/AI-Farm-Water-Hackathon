@@ -29,6 +29,7 @@ const getApiBase = () => {
 const API_BASE = getApiBase();
 let updateInterval = null;
 let simulationActive = false;
+let simulationPaused = false;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
@@ -328,6 +329,40 @@ async function stopSimulation() {
         }
     } catch (error) {
         console.error('Error stopping simulation:', error);
+    }
+}
+
+async function pauseSimulation() {
+    try {
+        const response = await fetch(`${API_BASE}/simulation/pause`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        if (data.status === 'paused') {
+            simulationPaused = true;
+            updateStatusUI(true, true);
+        }
+    } catch (error) {
+        console.error('Error pausing simulation:', error);
+    }
+}
+
+async function stepSimulation() {
+    try {
+        const response = await fetch(`${API_BASE}/simulation/step`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        if (data.status === 'stepped') {
+            // Update status after stepping
+            updateStatus();
+        } else {
+            console.error('Step failed:', data.message);
+        }
+    } catch (error) {
+        console.error('Error stepping simulation:', error);
     }
 }
 
