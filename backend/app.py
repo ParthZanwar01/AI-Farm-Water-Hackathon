@@ -23,22 +23,49 @@ from models.heat_predictor import HeatSpikePredictor
 
 app = Flask(__name__, static_folder='../frontend')
 
-# Configure CORS - allow requests from Netlify and localhost
-# In production, allow all origins (Netlify URLs can vary)
-# You can restrict this if needed for security
-if os.environ.get('FLASK_ENV') == 'production':
-    # Production: Allow all origins (Netlify URLs can vary)
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": "*",
-            "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True
-        }
-    })
-else:
-    # Development: allow all origins
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+# Configure CORS - allow requests from all origins
+# This is necessary for Netlify frontend to communicate with Render backend
+# In production, Render sets PORT environment variable, so we detect production that way
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
+
+# Global error handler to return JSON instead of HTML error pages
+@app.errorhandler(500)
+def handle_500_error(e):
+    """Return JSON error response instead of HTML"""
+    print(f"Internal Server Error: {e}")
+    import traceback
+    traceback.print_exc()
+    return jsonify({
+        'status': 'error',
+        'message': 'Internal server error',
+        'error': str(e) if app.debug else None
+    }), 500
+
+@app.errorhandler(404)
+def handle_404_error(e):
+    """Return JSON error response for 404"""
+    return jsonify({
+        'status': 'error',
+        'message': 'Endpoint not found'
+    }), 404
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Catch all exceptions and return JSON"""
+    print(f"Unhandled exception: {e}")
+    import traceback
+    traceback.print_exc()
+    return jsonify({
+        'status': 'error',
+        'message': str(e) if app.debug else 'An error occurred'
+    }), 500
 
 # Helper to sanitize JSON response
 def sanitize_float(val):
@@ -49,12 +76,23 @@ def sanitize_float(val):
 def sanitize_dict(d):
     return {k: sanitize_float(v) if isinstance(v, (float, int)) else (sanitize_dict(v) if isinstance(v, dict) else v) for k, v in d.items()}
 
-# Initialize the ML predictor
-predictor = HeatSpikePredictor()
+# Initialize the ML predictor with error handling
+try:
+    predictor = HeatSpikePredictor()
+    predictor_ready = True
+except Exception as e:
+    print(f"⚠️  Failed to initialize predictor: {e}")
+    import traceback
+    traceback.print_exc()
+    predictor = None
+    predictor_ready = False
 
 # Train model in background to avoid blocking startup on Render
 # Model training can take time with large datasets, so we do it async
 def train_model_async():
+    if not predictor_ready or predictor is None:
+        print("⚠️  Skipping model training - predictor not initialized")
+        return
     try:
         print("🤖 Starting ML model training in background...")
         predictor.train()
@@ -66,15 +104,27 @@ def train_model_async():
 
 # Start training in background thread (non-blocking)
 # This allows gunicorn to start immediately while model trains
-if os.environ.get('FLASK_ENV') == 'production':
+# Render sets PORT environment variable, so use that to detect production
+is_production = os.environ.get('PORT') is not None or os.environ.get('FLASK_ENV') == 'production'
+
+if is_production:
     # In production, train async to avoid blocking gunicorn startup
-    training_thread = threading.Thread(target=train_model_async, daemon=True)
-    training_thread.start()
-    print("🚀 Flask app ready, model training in background...")
+    if predictor_ready:
+        training_thread = threading.Thread(target=train_model_async, daemon=True)
+        training_thread.start()
+        print("🚀 Flask app ready, model training in background...")
+    else:
+        print("🚀 Flask app ready (predictor not available, running without ML)")
 else:
     # In development, train synchronously for easier debugging
-    print("Training model synchronously (development mode)...")
-    predictor.train()
+    if predictor_ready:
+        print("Training model synchronously (development mode)...")
+        try:
+            predictor.train()
+        except Exception as e:
+            print(f"⚠️  Model training failed: {e}")
+    else:
+        print("⚠️  Running without ML model (predictor not initialized)")
 
 # Simulated server state (24 server areas)
 server_state = {
@@ -180,7 +230,11 @@ def simulation_loop():
             if not server_state['areas'][area_id]['water_active']:
                  server_state['areas'][area_id]['current_temp'] = temperature
                  # Record in ML model
-                 predictor.record_heat_spike(area_id, temperature)
+                 if predictor_ready and predictor is not None:
+                     try:
+                         predictor.record_heat_spike(area_id, temperature)
+                     except Exception as e:
+                         print(f"Warning: Failed to record heat spike: {e}")
             
         # --- HEAT SPREAD (DIFFUSION) ---
         # Calculate deltas first (synchronous update)
@@ -217,10 +271,17 @@ def simulation_loop():
                     
             elif server_state['system_mode'] == 'ai':
                 # PREDICTIVE: Check ML model
-                pred = predictor.predict(area_id)
+                if predictor_ready and predictor is not None:
+                    try:
+                        pred = predictor.predict(area_id)
+                        predictive_trigger = pred['spike_probability'] > 0.7
+                    except Exception as e:
+                        print(f"Warning: Prediction failed for area {area_id}: {e}")
+                        predictive_trigger = False
+                else:
+                    predictive_trigger = False
                 
                 # Logic: High probability predicts spike OR Failsafe (Reactive backup)
-                predictive_trigger = pred['spike_probability'] > 0.7
                 failsafe_trigger = area['current_temp'] > 85.0
                 
                 if (predictive_trigger or failsafe_trigger) and not area['water_active']:
@@ -266,12 +327,20 @@ def get_status():
         
         # Get predictions for all 24 servers
         for area_id in range(24):
-            try:
-                prediction = predictor.predict(area_id)
-                predictions[area_id] = prediction
-            except Exception as e:
-                # If prediction fails for a server, use default values
-                print(f"Warning: Prediction failed for server {area_id}: {e}")
+            if predictor_ready and predictor is not None:
+                try:
+                    prediction = predictor.predict(area_id)
+                    predictions[area_id] = prediction
+                except Exception as e:
+                    # If prediction fails for a server, use default values
+                    print(f"Warning: Prediction failed for server {area_id}: {e}")
+                    predictions[area_id] = {
+                        'predicted_temperature': 70.0,
+                        'spike_probability': 0.1,
+                        'confidence': 0.0
+                    }
+            else:
+                # Predictor not available, use default values
                 predictions[area_id] = {
                     'predicted_temperature': 70.0,
                     'spike_probability': 0.1,
@@ -336,8 +405,22 @@ def get_predictions():
     predictions = {}
     
     for area_id in range(24):
-        prediction = predictor.predict(area_id)
-        predictions[area_id] = prediction
+        if predictor_ready and predictor is not None:
+            try:
+                prediction = predictor.predict(area_id)
+                predictions[area_id] = prediction
+            except Exception as e:
+                predictions[area_id] = {
+                    'predicted_temperature': 70.0,
+                    'spike_probability': 0.1,
+                    'confidence': 0.0
+                }
+        else:
+            predictions[area_id] = {
+                'predicted_temperature': 70.0,
+                'spike_probability': 0.1,
+                'confidence': 0.0
+            }
     
     return jsonify(sanitize_dict(predictions))
 
@@ -369,7 +452,8 @@ def record_heat_spike():
             except ValueError:
                 return jsonify({'status': 'error', 'message': 'Invalid timestamp format'}), 400
         
-        predictor.record_heat_spike(area_id, temperature, timestamp)
+        if predictor_ready and predictor is not None:
+            predictor.record_heat_spike(area_id, temperature, timestamp)
         
         # Update server state
         if 0 <= area_id < len(server_state['areas']):
@@ -383,6 +467,8 @@ def record_heat_spike():
 def get_history():
     """Get historical heat spike data"""
     try:
+        if not predictor_ready or predictor is None:
+            return jsonify([])
         df = predictor._load_data()
         
         # Convert to list of dicts (handle empty dataframe)
@@ -496,7 +582,11 @@ def step_simulation():
         area_id, temperature = generate_random_heat_spike()
         if not server_state['areas'][area_id]['water_active']:
             server_state['areas'][area_id]['current_temp'] = temperature
-            predictor.record_heat_spike(area_id, temperature)
+            if predictor_ready and predictor is not None:
+                try:
+                    predictor.record_heat_spike(area_id, temperature)
+                except Exception as e:
+                    print(f"Warning: Failed to record heat spike: {e}")
     
     # Heat spread (diffusion)
     heat_deltas = {i: 0.0 for i in range(24)}
@@ -524,8 +614,15 @@ def step_simulation():
             if area['current_temp'] > 85.0 and not area['water_active']:
                 area['water_active'] = True
         elif server_state['system_mode'] == 'ai':
-            pred = predictor.predict(area_id)
-            predictive_trigger = pred['spike_probability'] > 0.7
+            if predictor_ready and predictor is not None:
+                try:
+                    pred = predictor.predict(area_id)
+                    predictive_trigger = pred['spike_probability'] > 0.7
+                except Exception as e:
+                    print(f"Warning: Prediction failed for area {area_id}: {e}")
+                    predictive_trigger = False
+            else:
+                predictive_trigger = False
             failsafe_trigger = area['current_temp'] > 85.0
             if (predictive_trigger or failsafe_trigger) and not area['water_active']:
                 area['water_active'] = True
@@ -547,21 +644,49 @@ def step_simulation():
 @app.route('/api/simulation/trigger-spike', methods=['POST'])
 def trigger_spike():
     """Trigger a random heat spike manually"""
-    global server_state
-    area_id, temperature = generate_random_heat_spike()
-    server_state['areas'][area_id]['current_temp'] = temperature
-    predictor.record_heat_spike(area_id, temperature)
-    return jsonify({
-        'status': 'triggered', 
-        'message': f'Heat spike triggered on Server {area_id} ({temperature:.1f}°F)',
-        'area_id': area_id,
-        'temperature': temperature
-    })
+    try:
+        global server_state
+        area_id, temperature = generate_random_heat_spike()
+        
+        # Validate area_id
+        if not isinstance(area_id, int) or area_id < 0 or area_id >= len(server_state['areas']):
+            return jsonify({'status': 'error', 'message': 'Invalid area_id generated'}), 500
+        
+        server_state['areas'][area_id]['current_temp'] = temperature
+        
+        # Record heat spike (may fail if predictor not ready, but don't crash)
+        if predictor_ready and predictor is not None:
+            try:
+                predictor.record_heat_spike(area_id, temperature)
+            except Exception as e:
+                print(f"Warning: Failed to record heat spike: {e}")
+                # Continue anyway - spike is still triggered
+        
+        return jsonify({
+            'status': 'triggered', 
+            'message': f'Heat spike triggered on Server {area_id} ({temperature:.1f}°F)',
+            'area_id': area_id,
+            'temperature': temperature
+        })
+    except Exception as e:
+        print(f"Error in trigger_spike: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
 @app.route('/api/model/retrain', methods=['POST'])
 def retrain_model():
     """Retrain the ML model"""
     try:
+        if not predictor_ready or predictor is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Predictor not available'
+            }), 500
+        
         import time
         start_time = time.time()
         
