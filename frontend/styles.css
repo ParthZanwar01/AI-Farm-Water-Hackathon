@@ -1,17 +1,24 @@
 :root {
-    --bg-dark: #0f172a;
-    --bg-darker: #020617;
-    --card-bg: #1e293b;
+    /* Holiday Theme Colors */
+    --bg-dark: #0a1a0f;
+    --bg-darker: #051008;
+    --card-bg: #1a2e1f;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
-    --accent-primary: #3b82f6;
-    /* Blue */
-    --accent-secondary: #06b6d4;
-    /* Cyan */
+    --accent-primary: #dc2626;
+    /* Holiday Red */
+    --accent-secondary: #16a34a;
+    /* Holiday Green */
     --success: #22c55e;
-    --warning: #eab308;
+    --warning: #fbbf24;
+    /* Gold */
     --danger: #ef4444;
-    --border-color: #334155;
+    --border-color: #2d4a35;
+    /* Holiday accent colors */
+    --holiday-red: #dc2626;
+    --holiday-green: #16a34a;
+    --holiday-gold: #fbbf24;
+    --holiday-snow: #ffffff;
 }
 
 * {
@@ -22,22 +29,57 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background-color: var(--bg-darker);
+    background: linear-gradient(135deg, #051008 0%, #0a1a0f 50%, #051008 100%);
+    background-attachment: fixed;
     color: var(--text-primary);
     overflow: hidden;
     /* App-like feel */
     height: 100vh;
+    position: relative;
 }
 
-/* Loading Notice Banner */
+/* Holiday Snowflakes Animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(2px 2px at 60px 70px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 50px 50px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1px 1px at 80px 10px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(2px 2px at 90px 40px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 33px 60px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(2px 2px at 40px 80px, rgba(255,255,255,0.6), transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: snowfall 20s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.6;
+}
+
+@keyframes snowfall {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(200px);
+    }
+}
+
+/* Loading Notice Banner - Holiday Theme */
 .loading-notice {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(6, 182, 212, 0.95));
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.95), rgba(22, 163, 74, 0.95));
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(251, 191, 36, 0.3);
     z-index: 1000;
     padding: 0.75rem 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -127,14 +169,31 @@ body {
     margin-top: 50px;
 }
 
-/* Sidebar */
+/* Sidebar - Holiday Theme */
 .sidebar {
-    background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(15, 23, 42, 0.98) 100%);
-    border-right: 1px solid var(--border-color);
+    background: linear-gradient(180deg, rgba(10, 26, 15, 0.98) 0%, rgba(5, 16, 8, 0.98) 100%);
+    border-right: 2px solid var(--holiday-gold);
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}
+
+.sidebar::before {
+    content: '❄';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    opacity: 0.3;
+    animation: twinkle 2s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
 }
 
 .brand {
@@ -148,17 +207,19 @@ body {
     font-size: 1.5rem;
     width: 44px;
     height: 44px;
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    background: linear-gradient(135deg, var(--holiday-red), var(--holiday-green));
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4), 0 0 20px rgba(22, 163, 74, 0.3);
     transition: transform 0.3s ease;
+    border: 2px solid var(--holiday-gold);
 }
 
 .logo-icon:hover {
     transform: scale(1.05) rotate(5deg);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6), 0 0 30px rgba(22, 163, 74, 0.5);
 }
 
 .brand h1 {
@@ -211,10 +272,16 @@ input[type="radio"]:checked+.toggle-btn {
 }
 
 input[type="radio"]:checked+.toggle-btn.special {
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    background: linear-gradient(135deg, var(--holiday-red), var(--holiday-green));
     color: white;
-    border: none;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    border: 2px solid var(--holiday-gold);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4), 0 0 20px rgba(22, 163, 74, 0.3);
+    animation: holidayGlow 2s ease-in-out infinite;
+}
+
+@keyframes holidayGlow {
+    0%, 100% { box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4), 0 0 20px rgba(22, 163, 74, 0.3); }
+    50% { box-shadow: 0 4px 16px rgba(220, 38, 38, 0.6), 0 0 30px rgba(22, 163, 74, 0.5); }
 }
 
 .divider {
@@ -257,12 +324,14 @@ input[type="radio"]:checked+.toggle-btn.special {
 }
 
 .btn.primary {
-    background-color: var(--success);
-    color: var(--bg-darker);
+    background: linear-gradient(135deg, var(--holiday-green), #22c55e);
+    color: white;
+    border: 1px solid var(--holiday-gold);
 }
 
 .btn.primary:hover {
-    background-color: #4ade80;
+    background: linear-gradient(135deg, #22c55e, var(--holiday-green));
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
 }
 
 .btn.secondary {
@@ -276,25 +345,27 @@ input[type="radio"]:checked+.toggle-btn.special {
 }
 
 .btn.danger {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background-color: rgba(220, 38, 38, 0.1);
+    color: var(--holiday-red);
+    border: 1px solid rgba(220, 38, 38, 0.3);
 }
 
 .btn.danger:hover {
-    background-color: var(--danger);
+    background: linear-gradient(135deg, var(--holiday-red), #ef4444);
     color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
 }
 
 .btn.accent {
-    background-color: rgba(59, 130, 246, 0.1);
-    color: var(--accent-primary);
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    background-color: rgba(251, 191, 36, 0.1);
+    color: var(--holiday-gold);
+    border: 1px solid rgba(251, 191, 36, 0.3);
 }
 
 .btn.accent:hover {
-    background-color: var(--accent-primary);
-    color: white;
+    background: linear-gradient(135deg, var(--holiday-gold), #fcd34d);
+    color: var(--bg-darker);
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
 }
 
 .status-section {
@@ -354,14 +425,26 @@ input[type="radio"]:checked+.toggle-btn.special {
 
 .top-bar {
     padding: 1.5rem 2rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--holiday-gold);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(180deg, rgba(2, 6, 23, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+    background: linear-gradient(180deg, rgba(5, 16, 8, 0.95) 0%, rgba(10, 26, 15, 0.9) 100%);
     backdrop-filter: blur(12px);
     z-index: 10;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.top-bar::after {
+    content: '🎄';
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    opacity: 0.5;
+    animation: twinkle 3s ease-in-out infinite;
 }
 
 .top-bar h2 {
@@ -408,8 +491,8 @@ input[type="radio"]:checked+.toggle-btn.special {
 }
 
 .dot.cooling {
-    background-color: var(--accent-primary);
-    box-shadow: 0 0 8px var(--accent-primary);
+    background-color: var(--holiday-green);
+    box-shadow: 0 0 8px var(--holiday-green), 0 0 12px rgba(22, 163, 74, 0.5);
 }
 
 .dashboard-grid {
@@ -422,7 +505,23 @@ input[type="radio"]:checked+.toggle-btn.special {
 .visualization-container {
     padding: 0;
     position: relative;
-    background: radial-gradient(ellipse at center, #1e293b 0%, #0f172a 50%, #020617 100%);
+    background: radial-gradient(ellipse at center, #1a2e1f 0%, #0a1a0f 50%, #051008 100%);
+    overflow: hidden;
+}
+
+.visualization-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(22, 163, 74, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 #canvas-container {
@@ -459,7 +558,8 @@ input[type="radio"]:checked+.toggle-btn.special {
 .overlay-stat .value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--accent-secondary);
+    color: var(--holiday-gold);
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
 }
 
 .server-grid-container {
@@ -476,7 +576,7 @@ input[type="radio"]:checked+.toggle-btn.special {
 }
 
 .server-card {
-    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(30, 41, 59, 0.95) 100%);
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 46, 31, 0.95) 100%);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 1rem;
@@ -484,6 +584,20 @@ input[type="radio"]:checked+.toggle-btn.special {
     position: relative;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.server-card::after {
+    content: '✨';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.server-card:hover::after {
+    opacity: 0.5;
 }
 
 .server-card::before {
@@ -499,9 +613,9 @@ input[type="radio"]:checked+.toggle-btn.special {
 }
 
 .server-card:hover {
-    border-color: var(--accent-primary);
+    border-color: var(--holiday-gold);
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3), 0 0 20px rgba(220, 38, 38, 0.2);
 }
 
 .server-card:hover::before {
@@ -555,7 +669,12 @@ input[type="radio"]:checked+.toggle-btn.special {
 }
 
 .server-card.cooling-active {
-    border-color: var(--accent-primary);
+    border-color: var(--holiday-green);
+    box-shadow: 0 0 15px rgba(22, 163, 74, 0.4);
+}
+
+.server-card.cooling-active::before {
+    background: linear-gradient(90deg, transparent, var(--holiday-green), transparent);
 }
 
 /* Switch Toggle Styles */
@@ -603,8 +722,8 @@ input[type="radio"]:checked+.toggle-btn.special {
 }
 
 input:checked+.slider {
-    background-color: var(--accent-primary);
-    border-color: var(--accent-primary);
+    background: linear-gradient(135deg, var(--holiday-red), var(--holiday-green));
+    border-color: var(--holiday-gold);
 }
 
 input:checked+.slider:before {
@@ -668,4 +787,32 @@ input:checked+.slider:before {
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.8; }
+}
+
+/* Holiday Decorative Elements */
+.holiday-decoration {
+    position: fixed;
+    pointer-events: none;
+    z-index: 2;
+    font-size: 1.5rem;
+    opacity: 0.3;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+/* Holiday-themed status badges */
+.status-badge.running {
+    background: linear-gradient(135deg, rgba(22, 163, 74, 0.2), rgba(34, 197, 94, 0.1));
+    color: var(--holiday-green);
+    border: 1px solid rgba(22, 163, 74, 0.3);
+}
+
+.status-badge.paused {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.1));
+    color: var(--holiday-gold);
+    border: 1px solid rgba(251, 191, 36, 0.3);
 }

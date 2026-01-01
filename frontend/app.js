@@ -31,8 +31,27 @@ let updateInterval = null;
 let simulationActive = false;
 let simulationPaused = false;
 
+// Holiday decorations
+function createHolidayDecorations() {
+    const decorations = ['🎄', '❄️', '🎁', '⭐', '🔔', '🎅'];
+    const container = document.body;
+    
+    // Create floating decorations
+    for (let i = 0; i < 8; i++) {
+        const decoration = document.createElement('div');
+        decoration.className = 'holiday-decoration';
+        decoration.textContent = decorations[Math.floor(Math.random() * decorations.length)];
+        decoration.style.left = Math.random() * 100 + '%';
+        decoration.style.top = Math.random() * 100 + '%';
+        decoration.style.animationDelay = Math.random() * 3 + 's';
+        decoration.style.animationDuration = (3 + Math.random() * 2) + 's';
+        container.appendChild(decoration);
+    }
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
+    createHolidayDecorations();
     initializeServerGrid();
     setupEventListeners();
     startStatusUpdates();
@@ -134,10 +153,10 @@ function initThreeJS() {
     const width = container.clientWidth;
     const height = container.clientHeight || 400; // Use container height or fallback
 
-    // Scene
+    // Scene - Holiday Theme
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0f172a); // Match CSS bg-darkish
-    scene.fog = new THREE.Fog(0x0f172a, 10, 60);
+    scene.background = new THREE.Color(0x0a1a0f); // Holiday dark green
+    scene.fog = new THREE.Fog(0x0a1a0f, 10, 60);
 
     // Camera
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
@@ -164,10 +183,10 @@ function initThreeJS() {
     scene.add(blueSpot);
 
     // --- SCENE SETUP ---
-    // Floor
+    // Floor - Holiday Theme
     const floorGeo = new THREE.PlaneGeometry(60, 60);
     const floorMat = new THREE.MeshStandardMaterial({
-        color: 0x0f172a,
+        color: 0x0a1a0f,
         roughness: 0.8,
         metalness: 0.2
     });
@@ -176,8 +195,8 @@ function initThreeJS() {
     floor.position.y = -2;
     scene.add(floor);
 
-    // Grid
-    const gridHelper = new THREE.GridHelper(60, 60, 0x1e293b, 0x0f172a);
+    // Grid - Holiday Theme
+    const gridHelper = new THREE.GridHelper(60, 60, 0x1a2e1f, 0x0a1a0f);
     gridHelper.position.y = -1.9;
     scene.add(gridHelper);
 
@@ -193,7 +212,7 @@ function initThreeJS() {
         const serverInRackIndex = i % 6;
 
         const mat = new THREE.MeshStandardMaterial({
-            color: 0x22c55e, // Success green
+            color: 0x16a34a, // Holiday green
             roughness: 0.4,
             metalness: 0.7
         });
@@ -546,18 +565,18 @@ function updateServerArea(areaId, temperature, waterActive) {
     const card = document.getElementById(`server-${areaId}`);
     if (!card) return;
 
-    // Update 3D Mesh
+    // Update 3D Mesh - Holiday Theme
     const mesh = serverMeshes[areaId];
     if (mesh) {
         if (waterActive) {
-            mesh.material.color.setHex(0x3b82f6); // Blue
-            mesh.material.emissive.setHex(0x1d4ed8);
+            mesh.material.color.setHex(0x16a34a); // Holiday Green
+            mesh.material.emissive.setHex(0x22c55e);
         } else {
             mesh.material.emissive.setHex(0x000000);
-            if (temperature >= 90) mesh.material.color.setHex(0xef4444); // Red
-            else if (temperature >= 85) mesh.material.color.setHex(0xf97316); // Orange
-            else if (temperature >= 80) mesh.material.color.setHex(0xeab308); // Yellow
-            else mesh.material.color.setHex(0x22c55e); // Green
+            if (temperature >= 90) mesh.material.color.setHex(0xdc2626); // Holiday Red
+            else if (temperature >= 85) mesh.material.color.setHex(0xfbbf24); // Holiday Gold
+            else if (temperature >= 80) mesh.material.color.setHex(0xfbbf24); // Holiday Gold
+            else mesh.material.color.setHex(0x16a34a); // Holiday Green
         }
     }
 
