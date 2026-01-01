@@ -1,62 +1,73 @@
-# AI Farm Water Management System
+# AI Farm Water Management System 🎄
 
 An intelligent water cooling system for AI farm data servers that uses machine learning to predict heat spikes before they occur, enabling proactive cooling instead of reactive flooding.
 
 ## Features
 
-- **Predictive AI System**: Uses machine learning to analyze historical heat spike patterns and predict future heat spikes
-- **Real-time Simulation**: Visual frontend showing server temperatures and water cooling system in action
-- **Proactive Cooling**: Targets specific server areas based on predictions rather than flooding entire areas reactively
-- **Historical Analysis**: Tracks and learns from past heat spike patterns to improve predictions
+- **Predictive AI System**: ML model analyzes historical patterns to predict future heat spikes
+- **Real-time 3D Visualization**: Interactive frontend with Three.js showing 24 servers across 4 racks
+- **Proactive Cooling**: Targets specific server areas based on predictions rather than flooding entire areas
+- **Dual Modes**: Switch between Standard (reactive) and AI (predictive) cooling modes
+- **Holiday Theme**: Festive red, green, and gold color scheme with animated decorations
+
+## Tech Stack
+
+- **Backend**: Python, Flask, scikit-learn, pandas, numpy
+- **Frontend**: JavaScript, HTML, CSS, Three.js
+- **ML Model**: Random Forest classifier for heat spike prediction
+
+## Quick Start
+
+1. Install dependencies:
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+2. Run the server:
+```bash
+python app.py
+```
+
+3. Open `http://localhost:5001` in your browser
 
 ## Project Structure
 
 ```
 .
-├── app.py                 # Flask backend API server
-├── models/
-│   ├── __init__.py
-│   └── heat_predictor.py  # ML model for heat spike prediction
-├── data/
-│   └── heat_spikes.csv    # Historical heat spike data
+├── backend/
+│   ├── app.py              # Flask API server
+│   ├── models/
+│   │   └── heat_predictor.py  # ML model
+│   ├── data/
+│   │   └── heat_spikes.csv    # Historical data
+│   └── requirements.txt
 ├── frontend/
-│   ├── index.html         # Main frontend page
-│   ├── styles.css         # Styling
-│   └── app.js             # Frontend logic and visualization
-├── requirements.txt       # Python dependencies
-└── README.md             # This file
+│   ├── index.html          # Main page
+│   ├── styles.css          # Styling
+│   └── app.js              # Frontend logic & 3D visualization
+└── README.md
 ```
-
-## Installation
-
-1. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-2. Run the application:
-```bash
-python app.py
-```
-
-3. Open your browser and navigate to `http://localhost:5000`
 
 ## How It Works
 
-1. **Data Collection**: The system collects historical heat spike data from different server areas
-2. **ML Prediction**: The AI model analyzes patterns in the historical data to predict when and where heat spikes are likely to occur
-3. **Proactive Cooling**: Water is directed to specific server areas before heat spikes occur, based on predictions
-4. **Continuous Learning**: As new heat spikes are detected, the model retrains to improve accuracy
+1. **Data Collection**: System tracks heat spikes across 24 server areas
+2. **ML Prediction**: Model analyzes patterns (server location, time, temperature) to predict spikes
+3. **Proactive Cooling**: Water cooling activates before predicted spikes occur
+4. **Continuous Learning**: Model retrains as new data is collected
 
 ## API Endpoints
 
-- `GET /api/status` - Get current server status and predictions
-- `GET /api/predict` - Get heat spike predictions for all server areas
-- `POST /api/heat-spike` - Record a new heat spike event
-- `GET /api/history` - Get historical heat spike data
+- `GET /api/status` - Current server status and predictions
+- `GET /api/predict` - Heat spike predictions for all areas
+- `POST /api/heat-spike` - Record a new heat spike
+- `POST /api/simulation/start` - Start temperature simulation
+- `POST /api/mode` - Switch between standard/AI modes
 
+## Deployment
 
+The application can be deployed to:
+- **Backend**: Render, Railway, or Fly.io
+- **Frontend**: Netlify or Vercel
 
-
-
-
+Set the `API_BASE_URL` environment variable in your frontend deployment to point to your backend URL.
