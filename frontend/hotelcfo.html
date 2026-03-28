@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HotelCFO — AI Financial Intelligence for Hotels</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0a1628;
+      --navy-mid: #0f2040;
+      --blue: #1a6ef5;
+      --blue-light: #3b8bff;
+      --gold: #f0a500;
+      --gold-light: #ffc744;
+      --green: #22c55e;
+      --red: #ef4444;
+      --text: #e8edf4;
+      --text-muted: #8a9bb8;
+      --border: rgba(255,255,255,0.08);
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.1);
+      --section-pad: 100px 24px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(10,22,40,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
+    .nav-logo span { color: var(--gold); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--blue); color: #fff; border: none; padding: 10px 22px;
+      border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: background .2s;
+    }
+    .nav-cta:hover { background: var(--blue-light); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(26,110,245,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 70%, rgba(240,165,0,0.08) 0%, transparent 60%),
+        var(--navy);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(26,110,245,0.15); border: 1px solid rgba(26,110,245,0.35);
+      color: var(--blue-light); padding: 6px 14px; border-radius: 100px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px;
+      margin-bottom: 28px; text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800; line-height: 1.1; letter-spacing: -2px;
+      margin-bottom: 24px;
+    }
+    .hero h1 em { font-style: normal; color: var(--gold); }
+    .hero p {
+      max-width: 600px; font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px;
+    }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      background: var(--blue); color: #fff; padding: 14px 32px;
+      border-radius: 10px; font-size: 1rem; font-weight: 700; border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .btn-primary:hover { background: var(--blue-light); transform: translateY(-1px); }
+    .btn-ghost {
+      background: transparent; color: var(--text); padding: 14px 32px;
+      border-radius: 10px; font-size: 1rem; font-weight: 600;
+      border: 1px solid var(--card-border); cursor: pointer; transition: border-color .2s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.3); }
+    .hero-stats {
+      display: flex; gap: 48px; margin-top: 72px; flex-wrap: wrap; justify-content: center;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 2rem; font-weight: 800; color: var(--gold); }
+    .hero-stat .lbl { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── SECTION WRAPPER ── */
+    section { padding: var(--section-pad); }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block; color: var(--blue-light); font-size: 0.8rem;
+      font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -1px;
+      line-height: 1.2; margin-bottom: 16px;
+    }
+    .section-sub { color: var(--text-muted); font-size: 1.05rem; max-width: 560px; }
+
+    /* ── PROBLEM ── */
+    .problem { background: var(--navy-mid); }
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px;
+    }
+    .problem-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 28px;
+    }
+    .problem-card .icon { font-size: 1.8rem; margin-bottom: 14px; }
+    .problem-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+    .problem-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+    .problem-card.highlight { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.06); }
+
+    /* ── FEATURES ── */
+    .features-header { text-align: center; margin-bottom: 64px; }
+    .features-header .section-sub { margin: 0 auto; }
+    .features-list { display: flex; flex-direction: column; gap: 24px; }
+    .feature-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center;
+    }
+    .feature-row.reverse { direction: rtl; }
+    .feature-row.reverse > * { direction: ltr; }
+    .feature-text { padding: 16px 0; }
+    .feature-num {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; color: var(--blue-light);
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .feature-text h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
+    .feature-text p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
+    .feature-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 32px; min-height: 220px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .feature-card .chip {
+      display: inline-block; padding: 4px 10px; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.3px;
+    }
+    .chip-green { background: rgba(34,197,94,0.15); color: var(--green); }
+    .chip-blue { background: rgba(26,110,245,0.15); color: var(--blue-light); }
+    .chip-gold { background: rgba(240,165,0,0.15); color: var(--gold-light); }
+    .chip-red { background: rgba(239,68,68,0.15); color: #f87171; }
+    .metric-row { display: flex; gap: 8px; align-items: baseline; }
+    .metric-big { font-size: 2.2rem; font-weight: 800; }
+    .metric-big.up { color: var(--green); }
+    .metric-big.down { color: var(--red); }
+    .metric-label-sm { font-size: 0.85rem; color: var(--text-muted); }
+    .ai-bubble {
+      background: rgba(26,110,245,0.1); border: 1px solid rgba(26,110,245,0.2);
+      border-radius: 12px; padding: 14px 16px; font-size: 0.88rem; color: var(--text); line-height: 1.5;
+    }
+    .ai-bubble .ai-label { color: var(--blue-light); font-weight: 700; font-size: 0.75rem; margin-bottom: 4px; }
+    .bar-row { display: flex; flex-direction: column; gap: 10px; }
+    .bar-item label { font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+    .bar-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; margin-top: 4px; }
+    .bar-fill { height: 100%; border-radius: 4px; }
+    .alert-list { display: flex; flex-direction: column; gap: 10px; }
+    .alert-item {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 12px 14px; font-size: 0.85rem;
+    }
+    .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .alert-dot.red { background: var(--red); }
+    .alert-dot.gold { background: var(--gold); }
+    .alert-dot.green { background: var(--green); }
+
+    /* ── METRICS STRIP ── */
+    .metrics-strip {
+      background: linear-gradient(135deg, var(--navy-mid), #0d1f3c);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 60px 24px;
+    }
+    .metrics-strip .section-inner { text-align: center; }
+    .metrics-strip h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin-bottom: 48px; letter-spacing: -0.5px; }
+    .metrics-strip h2 span { color: var(--gold); }
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    }
+    .kpi-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 28px 20px;
+    }
+    .kpi-card .kpi-icon { font-size: 1.6rem; margin-bottom: 10px; }
+    .kpi-card .kpi-val { font-size: 1.9rem; font-weight: 800; color: var(--blue-light); }
+    .kpi-card .kpi-name { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── PRICING ── */
+    .pricing { background: var(--navy-mid); }
+    .pricing-header { text-align: center; margin-bottom: 56px; }
+    .pricing-header .section-sub { margin: 0 auto; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .plan-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 36px 28px; position: relative;
+      transition: transform .2s;
+    }
+    .plan-card:hover { transform: translateY(-4px); }
+    .plan-card.featured {
+      border-color: var(--blue); background: rgba(26,110,245,0.08);
+    }
+    .plan-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--blue); color: #fff; padding: 4px 14px;
+      border-radius: 100px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .plan-name { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+    .plan-price { font-size: 3rem; font-weight: 800; letter-spacing: -2px; margin-bottom: 4px; }
+    .plan-price span { font-size: 1rem; font-weight: 500; color: var(--text-muted); }
+    .plan-target { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 28px; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .plan-features li { font-size: 0.9rem; display: flex; align-items: flex-start; gap: 10px; }
+    .plan-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .plan-btn {
+      display: block; width: 100%; margin-top: 32px; padding: 12px;
+      border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      text-align: center; border: none; transition: .2s;
+    }
+    .plan-btn.outline { background: transparent; border: 1px solid var(--card-border); color: var(--text); }
+    .plan-btn.outline:hover { border-color: rgba(255,255,255,0.3); }
+    .plan-btn.solid { background: var(--blue); color: #fff; }
+    .plan-btn.solid:hover { background: var(--blue-light); }
+
+    /* ── TESTIMONIALS / SOCIAL PROOF ── */
+    .social-proof { text-align: center; }
+    .proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 52px; }
+    .proof-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 28px 24px; text-align: left;
+    }
+    .proof-stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 12px; }
+    .proof-quote { font-size: 0.92rem; color: var(--text-muted); line-height: 1.7; font-style: italic; margin-bottom: 20px; }
+    .proof-author { display: flex; align-items: center; gap: 12px; }
+    .proof-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+    }
+    .proof-name { font-weight: 600; font-size: 0.88rem; }
+    .proof-role { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(26,110,245,0.12) 0%, rgba(240,165,0,0.06) 100%);
+      border-top: 1px solid var(--border);
+      padding: 100px 24px;
+    }
+    .cta-section h2 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; }
+    .cta-section h2 em { font-style: normal; color: var(--gold); }
+    .cta-section p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 40px; }
+    .cta-input-row { display: flex; gap: 12px; max-width: 460px; margin: 0 auto; }
+    .cta-input {
+      flex: 1; padding: 14px 18px; background: rgba(255,255,255,0.06);
+      border: 1px solid var(--card-border); border-radius: 10px; color: var(--text);
+      font-size: 0.95rem; outline: none; font-family: inherit;
+    }
+    .cta-input::placeholder { color: var(--text-muted); }
+    .cta-input:focus { border-color: var(--blue); }
+    .cta-section .note { font-size: 0.8rem; color: var(--text-muted); margin-top: 14px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy); border-top: 1px solid var(--border);
+      padding: 48px 24px; text-align: center;
+    }
+    footer .logo { font-size: 1.2rem; font-weight: 800; margin-bottom: 12px; }
+    footer .logo span { color: var(--gold); }
+    footer p { color: var(--text-muted); font-size: 0.85rem; }
+    footer .footer-links { display: flex; gap: 24px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
+    footer .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; }
+    footer .footer-links a:hover { color: var(--text); }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      width: 60px; height: 3px; background: linear-gradient(90deg, var(--blue), var(--gold));
+      border-radius: 2px; margin: 20px 0 40px;
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .problem-grid, .kpi-grid, .pricing-grid, .proof-grid { grid-template-columns: 1fr; }
+      .feature-row, .feature-row.reverse { grid-template-columns: 1fr; direction: ltr; }
+      .cta-input-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Hotel<span>CFO</span></div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#metrics">Metrics</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <button class="nav-cta">Get Early Access</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-badge">🏨 AI-Powered Hotel Finance</div>
+  <h1>Your hotel's<br /><em>AI CFO</em><br />never sleeps.</h1>
+  <p>Enterprise-level financial intelligence for independent and mid-size hotels — without the $200k salary.</p>
+  <div class="hero-actions">
+    <button class="btn-primary">Start Free Pilot →</button>
+    <button class="btn-ghost">See How It Works</button>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="num">$18/room</div>
+      <div class="lbl">avg. revenue left on the table</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">5–10</div>
+      <div class="lbl">disconnected systems per hotel</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">$200k+</div>
+      <div class="lbl">cost of a real CFO</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="section-inner">
+    <span class="section-tag">The Problem</span>
+    <h2 class="section-title">You're flying blind<br />with fragmented data.</h2>
+    <div class="section-divider"></div>
+    <p class="section-sub">Hotel owners manage finances across 5–10 disconnected systems. Nobody has a unified picture — and they find out they're losing money weeks too late.</p>
+    <div class="problem-grid">
+      <div class="problem-card highlight">
+        <div class="icon">🧩</div>
+        <h3>Disconnected Systems</h3>
+        <p>Opera, Mews, Cloudbeds, Booking.com, Expedia, payroll, F&amp;B POS, and spreadsheets — all separate. No single source of truth.</p>
+      </div>
+      <div class="problem-card highlight">
+        <div class="icon">📉</div>
+        <h3>Lagging Insight</h3>
+        <p>By the time you notice a margin problem, you're already two weeks deep. Reactive decisions cost rooms, staff hours, and revenue.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">💸</div>
+        <h3>CFO is Out of Reach</h3>
+        <p>Enterprise hotels have a dedicated CFO. Independent properties can't afford $200k+/yr — so they manage by gut feel.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">📊</div>
+        <h3>Wrong Metrics</h3>
+        <p>Generic accounting tools don't speak hotel. RevPAR, GOPPAR, TRevPAR — your tools don't track what actually drives your business.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="features-header">
+      <span class="section-tag">What You Get</span>
+      <h2 class="section-title">Everything a CFO does,<br />automated for hotels.</h2>
+      <div class="section-divider" style="margin: 20px auto 0;"></div>
+    </div>
+
+    <div class="features-list">
+
+      <!-- Feature 1 -->
+      <div class="feature-row">
+        <div class="feature-text">
+          <div class="feature-num">01 — Connect Everything</div>
+          <h3>One dashboard.<br />All your systems.</h3>
+          <p>Pull data from Opera, Mews, Cloudbeds, OTAs, payroll, and F&amp;B POS into a single live view. No manual exports. No spreadsheet juggling.</p>
+        </div>
+        <div class="feature-card">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="chip chip-blue">Opera</span>
+            <span class="chip chip-blue">Mews</span>
+            <span class="chip chip-blue">Cloudbeds</span>
+            <span class="chip chip-gold">Booking.com</span>
+            <span class="chip chip-gold">Expedia</span>
+            <span class="chip chip-green">Payroll</span>
+            <span class="chip chip-green">F&amp;B POS</span>
+          </div>
+          <div style="height:1px; background:var(--border);"></div>
+          <div class="ai-bubble">
+            <div class="ai-label">✦ HotelCFO</div>
+            All 7 integrations synced. Last updated 2 min ago.
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-row reverse">
+        <div class="feature-text">
+          <div class="feature-num">02 — Hotel-Specific AI Metrics</div>
+          <h3>RevPAR, GOPPAR, ADR —<br />explained in plain English.</h3>
+          <p>HotelCFO auto-calculates every metric that matters and tells you exactly what's driving changes — in language your whole team understands.</p>
+        </div>
+        <div class="feature-card">
+          <span class="chip chip-blue">This Week vs. Last Week</span>
+          <div class="metric-row">
+            <span class="metric-big up">+$14</span>
+            <span class="metric-label-sm">RevPAR</span>
+          </div>
+          <div class="ai-bubble">
+            <div class="ai-label">✦ AI Insight</div>
+            "Your labor cost jumped 12% this week due to 3 overtime shifts on Tuesday. ADR improved because of a weekend rate adjustment on Booking.com."
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-row">
+        <div class="feature-text">
+          <div class="feature-num">03 — Anomaly Detection</div>
+          <h3>Catch revenue leakage<br />before it compounds.</h3>
+          <p>AI monitors every margin and cost line in real time. When something looks off — F&amp;B dip, OTA commission spike, payroll creep — you get an alert instantly.</p>
+        </div>
+        <div class="feature-card">
+          <span class="chip chip-red">3 Active Alerts</span>
+          <div class="alert-list">
+            <div class="alert-item">
+              <span class="alert-dot red"></span>
+              F&amp;B margin dropped 8% vs 30-day avg — investigate kitchen waste
+            </div>
+            <div class="alert-item">
+              <span class="alert-dot gold"></span>
+              OTA commissions up $1,200 this week vs last
+            </div>
+            <div class="alert-item">
+              <span class="alert-dot green"></span>
+              Direct bookings up 18% — keep current promo running
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-row reverse">
+        <div class="feature-text">
+          <div class="feature-num">04 — Competitive Benchmarking</div>
+          <h3>See how you stack up<br />against your comp set.</h3>
+          <p>Compare your hotel's performance against similar properties in your market. Know exactly where you're leaving money on the table.</p>
+        </div>
+        <div class="feature-card">
+          <span class="chip chip-gold">Your Market · Downtown Comp Set</span>
+          <div class="bar-row">
+            <div class="bar-item">
+              <label><span>Your RevPAR</span><span>$118</span></label>
+              <div class="bar-track"><div class="bar-fill" style="width:65%; background:var(--blue-light);"></div></div>
+            </div>
+            <div class="bar-item">
+              <label><span>Market Avg</span><span>$136</span></label>
+              <div class="bar-track"><div class="bar-fill" style="width:75%; background:var(--text-muted);"></div></div>
+            </div>
+            <div class="bar-item">
+              <label><span>Top Performer</span><span>$162</span></label>
+              <div class="bar-track"><div class="bar-fill" style="width:90%; background:var(--gold);"></div></div>
+            </div>
+          </div>
+          <div class="ai-bubble">
+            <div class="ai-label">✦ Opportunity</div>
+            "You're leaving $18/room vs similar properties. Adjust Tue–Wed pricing to close the gap."
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- METRICS STRIP -->
+<div class="metrics-strip" id="metrics">
+  <div class="section-inner">
+    <h2>The metrics that <span>actually move your business</span></h2>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">🛏️</div>
+        <div class="kpi-val">RevPAR</div>
+        <div class="kpi-name">Revenue per Available Room</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-val">GOPPAR</div>
+        <div class="kpi-name">Gross Operating Profit per Room</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-val">ADR</div>
+        <div class="kpi-name">Average Daily Rate</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🍽️</div>
+        <div class="kpi-val">TRevPAR</div>
+        <div class="kpi-name">Total Revenue per Available Room</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-inner">
+    <div class="pricing-header">
+      <span class="section-tag">Pricing</span>
+      <h2 class="section-title">Enterprise insight.<br />Independent hotel budget.</h2>
+      <p class="section-sub">A fraction of what a real CFO costs. Cancel any time.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">$299<span>/mo</span></div>
+        <div class="plan-target">Independent hotels</div>
+        <ul class="plan-features">
+          <li>Up to 2 property integrations</li>
+          <li>Core KPI dashboard</li>
+          <li>Weekly AI summary report</li>
+          <li>Anomaly alerts via email</li>
+          <li>30-day benchmarking history</li>
+        </ul>
+        <button class="plan-btn outline">Start Free Trial</button>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name">Growth</div>
+        <div class="plan-price">$799<span>/mo</span></div>
+        <div class="plan-target">Mid-size chains · 2–10 properties</div>
+        <ul class="plan-features">
+          <li>Unlimited integrations</li>
+          <li>Full KPI suite + custom metrics</li>
+          <li>Real-time AI anomaly detection</li>
+          <li>Competitive benchmarking</li>
+          <li>AI recommendations engine</li>
+          <li>Slack &amp; SMS alerts</li>
+        </ul>
+        <button class="plan-btn solid">Get Started →</button>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price" style="font-size:2rem;">Custom</div>
+        <div class="plan-target">Large chains · resorts · groups</div>
+        <ul class="plan-features">
+          <li>Everything in Growth</li>
+          <li>Dedicated AI model tuning</li>
+          <li>Custom reporting &amp; branding</li>
+          <li>White-glove onboarding</li>
+          <li>SLA &amp; dedicated support</li>
+          <li>Multi-brand benchmarking</li>
+        </ul>
+        <button class="plan-btn outline">Contact Sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="social-proof">
+  <div class="section-inner">
+    <span class="section-tag">Early Feedback</span>
+    <h2 class="section-title">What hotel owners are saying.</h2>
+    <div class="proof-grid">
+      <div class="proof-card">
+        <div class="proof-stars">★★★★★</div>
+        <p class="proof-quote">"I had no idea we were losing $4k/month to OTA commissions until HotelCFO flagged it. Paid for itself in the first week."</p>
+        <div class="proof-author">
+          <div class="proof-avatar">MR</div>
+          <div>
+            <div class="proof-name">Marcus R.</div>
+            <div class="proof-role">Owner, 85-room boutique hotel · Austin</div>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card">
+        <div class="proof-stars">★★★★★</div>
+        <p class="proof-quote">"I used to spend 6 hours every Sunday pulling numbers from 4 different systems. Now I get a summary in my inbox every morning."</p>
+        <div class="proof-author">
+          <div class="proof-avatar">SL</div>
+          <div>
+            <div class="proof-name">Sandra L.</div>
+            <div class="proof-role">GM, 3-property regional chain · Nashville</div>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card">
+        <div class="proof-stars">★★★★★</div>
+        <p class="proof-quote">"The benchmarking feature alone is worth it. Seeing exactly where I stand vs. my comp set changed how I think about pricing entirely."</p>
+        <div class="proof-author">
+          <div class="proof-avatar">DK</div>
+          <div>
+            <div class="proof-name">David K.</div>
+            <div class="proof-role">Owner, 120-room independent hotel · Chicago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-inner">
+    <h2>Stop flying blind.<br />Start with a <em>free pilot.</em></h2>
+    <p>We'll connect to your systems, run 30 days of analysis, and show you exactly where you're leaving money on the table — free.</p>
+    <div class="cta-input-row">
+      <input type="email" class="cta-input" placeholder="your@hotel.com" />
+      <button class="btn-primary">Get Access →</button>
+    </div>
+    <p class="note">No credit card · No lock-in · Setup in under 20 minutes</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">Hotel<span>CFO</span></div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Security</a>
+    <a href="#">Contact</a>
+  </div>
+  <p>© 2026 HotelCFO. AI Financial Intelligence for Hotels.</p>
+</footer>
+
+</body>
+</html>

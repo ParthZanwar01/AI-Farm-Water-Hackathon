@@ -129,13 +129,22 @@ else:
 # Simulated server state (24 server areas)
 server_state = {
     'areas': [
-        {'id': i, 'current_temp': 72.0 + random.uniform(-2, 2), 'water_active': False}
+        {'id': i, 'current_temp': 72.0 + random.uniform(-2, 2), 'water_active': False, 'temp_delta': 0.0}
         for i in range(24)
     ],
     'simulation_active': False,
     'simulation_paused': False,
     'system_mode': 'standard',  # 'standard' (reactive) or 'ai' (predictive)
-    'auto_spikes_enabled': True # Toggle for automatic random spikes
+    'auto_spikes_enabled': True, # Toggle for automatic random spikes
+    # Water savings tracking
+    'proactive_cooling_events': 0,  # AI-triggered early interventions
+    'reactive_cooling_events': 0,   # Standard reactive triggers
+    'water_saved_gallons': 0.0,     # Estimated gallons saved by proactive cooling
+    'total_spikes_detected': 0,     # Total heat spikes observed
+    'spikes_prevented': 0,          # Spikes caught before threshold by AI mode
+    # Runtime tracking
+    'simulation_cycles': 0,
+    'simulation_start_time': None,
 }
 
 # Simulation thread
@@ -220,8 +229,12 @@ def generate_random_heat_spike():
 def simulation_loop():
     """Background simulation loop that generates random heat spikes and manages cooling"""
     global server_state
-    
+
     while server_state['simulation_active']:
+        server_state['simulation_cycles'] += 1
+        # Snapshot previous temps for delta calculation
+        prev_temps = {area['id']: area['current_temp'] for area in server_state['areas']}
+
         # Occasionally generate a heat spike (Random Event)
         # ONLY IF auto_spikes_enabled is True
         if server_state['auto_spikes_enabled'] and random.random() < 0.15:  # 15% chance
@@ -267,8 +280,10 @@ def simulation_loop():
                 # REACTIVE: If hot (>85), turn on water
                 if area['current_temp'] > 85.0 and not area['water_active']:
                     area['water_active'] = True
+                    server_state['reactive_cooling_events'] += 1
+                    server_state['total_spikes_detected'] += 1
                     print(f"[Standard] Reactive cooling activated for Server {area_id} at {area['current_temp']:.1f}F")
-                    
+
             elif server_state['system_mode'] == 'ai':
                 # PREDICTIVE: Check ML model
                 if predictor_ready and predictor is not None:
@@ -280,16 +295,24 @@ def simulation_loop():
                         predictive_trigger = False
                 else:
                     predictive_trigger = False
-                
+
                 # Logic: High probability predicts spike OR Failsafe (Reactive backup)
                 failsafe_trigger = area['current_temp'] > 85.0
-                
+
                 if (predictive_trigger or failsafe_trigger) and not area['water_active']:
                     area['water_active'] = True
-                    
+                    server_state['total_spikes_detected'] += 1
+
                     if predictive_trigger:
+                        # Proactive intervention: server temp is still below threshold
+                        server_state['proactive_cooling_events'] += 1
+                        # Proactive cooling uses ~0.8 gal vs reactive ~2.0 gal → saves 1.2 gal
+                        server_state['water_saved_gallons'] += 1.2
+                        if area['current_temp'] < 85.0:
+                            server_state['spikes_prevented'] += 1
                         print(f"[AI] PREDICTIVE cooling activated for Server {area_id} (Prob: {pred['spike_probability']:.2f})")
                     else:
+                        server_state['reactive_cooling_events'] += 1
                         print(f"[AI] FAILSAFE cooling activated for Server {area_id} (Temp: {area['current_temp']:.1f}F)")
 
             # --- PHYSICS ---
@@ -308,6 +331,10 @@ def simulation_loop():
                 elif area['current_temp'] < target_temp:
                     area['current_temp'] += random.uniform(0.1, 0.3)
         
+        # Compute per-area temperature delta for frontend trend arrows
+        for area in server_state['areas']:
+            area['temp_delta'] = round(area['current_temp'] - prev_temps.get(area['id'], area['current_temp']), 2)
+
         time.sleep(1)  # Faster updates (1s)
 
 @app.route('/api/health', methods=['GET'])
@@ -347,13 +374,26 @@ def get_status():
                     'confidence': 0.0
                 }
         
+        total = server_state['proactive_cooling_events'] + server_state['reactive_cooling_events']
+        efficiency_pct = round((server_state['proactive_cooling_events'] / total * 100) if total > 0 else 0, 1)
+
         return jsonify(sanitize_dict({
             'areas': server_state['areas'],
             'predictions': predictions,
             'simulation_active': server_state['simulation_active'],
             'simulation_paused': server_state.get('simulation_paused', False),
             'system_mode': server_state['system_mode'],
-            'auto_spikes_enabled': server_state['auto_spikes_enabled']
+            'auto_spikes_enabled': server_state['auto_spikes_enabled'],
+            'metrics': {
+                'water_saved_gallons': round(server_state['water_saved_gallons'], 1),
+                'proactive_cooling_events': server_state['proactive_cooling_events'],
+                'reactive_cooling_events': server_state['reactive_cooling_events'],
+                'spikes_prevented': server_state['spikes_prevented'],
+                'total_spikes_detected': server_state['total_spikes_detected'],
+                'ai_efficiency_pct': efficiency_pct,
+                'simulation_cycles': server_state.get('simulation_cycles', 0),
+                'runtime_seconds': int(time.time() - server_state['simulation_start_time']) if server_state.get('simulation_start_time') else 0,
+            }
         }))
     except Exception as e:
         print(f"Error in get_status: {e}")
@@ -542,6 +582,8 @@ def start_simulation():
     
     if not server_state['simulation_active']:
         server_state['simulation_active'] = True
+        server_state['simulation_cycles'] = 0
+        server_state['simulation_start_time'] = time.time()
         simulation_thread = threading.Thread(target=simulation_loop, daemon=True)
         simulation_thread.start()
         return jsonify({'status': 'started', 'message': 'Simulation started'})
@@ -554,6 +596,8 @@ def stop_simulation():
     global server_state
     server_state['simulation_active'] = False
     server_state['simulation_paused'] = False
+    server_state['simulation_start_time'] = None
+    server_state['simulation_cycles'] = 0
     return jsonify({'status': 'stopped', 'message': 'Simulation stopped'})
 
 @app.route('/api/simulation/pause', methods=['POST'])

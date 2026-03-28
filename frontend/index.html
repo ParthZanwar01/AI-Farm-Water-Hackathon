@@ -4,13 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎄 AI Farm | Water Cooling System 🎄</title>
+    <title>AquaCool AI | Data Center Water Management</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <script>
-        // Inject API URL from Netlify environment variable
+        // Inject API URL from environment variable or detect from hostname
         window.API_BASE_URL = '%REACT_APP_API_URL%' || (window.location.hostname === 'localhost' ? 'http://localhost:5001/api' : '/api');
     </script>
-    <!-- Google Fonts for Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,22 +21,29 @@
     <!-- Backend Loading Notice -->
     <div class="loading-notice" id="loadingNotice">
         <div class="loading-content">
-            <span class="loading-icon">🎄</span>
-            <span class="loading-text">Backend is initializing... Please wait a moment for the server to fully start. This may take 30-60 seconds on first load. 🎁</span>
+            <span class="loading-icon">⟳</span>
+            <span class="loading-text">Connecting to backend... This may take 30–60 seconds on first load.</span>
             <button class="loading-dismiss" id="dismissNotice" aria-label="Dismiss">×</button>
         </div>
     </div>
 
-    <div class="app-container">
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app-container with-notice">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="brand">
-                <div class="logo-icon">🎄</div>
-                <h1>AI Farm</h1>
+                <div class="logo-icon">💧</div>
+                <div>
+                    <h1>AquaCool AI</h1>
+                    <div class="brand-sub">Data Center Cooling</div>
+                </div>
             </div>
+            <a href="about.html" class="about-link">Why AquaCool AI →</a>
 
             <div class="control-panel">
-                <h2>System Mode</h2>
+                <h2>Cooling Mode</h2>
                 <div class="mode-toggles">
                     <div class="toggle-group">
                         <input type="radio" name="systemMode" id="modeStandard" checked>
@@ -47,7 +53,6 @@
                         <label for="modeAI" class="toggle-btn special">AI Predictive</label>
                     </div>
 
-                    <!-- NEW: Auto-Spike Toggle -->
                     <div class="toggle-group mt-large">
                         <label class="switch-label">
                             <input type="checkbox" id="autoSpikesToggle" checked>
@@ -57,31 +62,40 @@
                     </div>
                 </div>
 
+                <div class="speed-row">
+                    <span class="speed-label">Poll speed</span>
+                    <select id="simSpeed" class="speed-select">
+                        <option value="500">Fast (0.5s)</option>
+                        <option value="2000" selected>Normal (2s)</option>
+                        <option value="5000">Slow (5s)</option>
+                    </select>
+                </div>
+
                 <div class="divider"></div>
 
-                <h2>Actions</h2>
+                <h2>Simulation</h2>
                 <div class="action-buttons">
                     <button id="startSim" class="btn primary">
-                        <span class="icon">▶</span> Start Simulation
+                        <span>▶</span> Start Simulation
                     </button>
-                    <button id="stopSim" class="btn secondary" disabled>
-                        <span class="icon">⏹</span> Stop
+                    <button id="stopSim" class="btn secondary" style="display: none;">
+                        <span>⏹</span> Stop
                     </button>
                     <button id="pauseSim" class="btn accent" style="display: none;">
-                        <span class="icon">⏸</span> Pause
+                        <span>⏸</span> Pause
                     </button>
                     <button id="stepSim" class="btn accent" style="display: none;">
-                        <span class="icon">⏭</span> Step Forward
+                        <span>⏭</span> Step Forward
                     </button>
                     <button id="triggerSpike" class="btn danger">
-                        <span class="icon">🔥</span> Trigger Spike 🎄
+                        <span>🔥</span> Trigger Heat Spike
                     </button>
                 </div>
 
                 <div class="divider"></div>
 
                 <div class="status-section">
-                    <h3>Global Status</h3>
+                    <h3>System Status</h3>
                     <div class="status-item">
                         <span>Simulation</span>
                         <span id="simStatus" class="status-badge stopped">Stopped</span>
@@ -94,6 +108,18 @@
                         <span>Total Spikes</span>
                         <span id="totalSpikes" class="status-value">0</span>
                     </div>
+                    <div class="status-item">
+                        <span>Mode</span>
+                        <span id="currentMode" class="status-value">Standard</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Runtime</span>
+                        <span id="simRuntime" class="status-value">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Cycles</span>
+                        <span id="simCycles" class="status-value">0</span>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -101,26 +127,91 @@
         <!-- Main Content Area -->
         <main class="main-content">
             <header class="top-bar">
-                <h2>🎄 Server Room 01 <span class="subtitle">Live Monitoring</span></h2>
-                <div class="legend">
-                    <span class="dot normal"></span> Normal
-                    <span class="dot warm"></span> Warm
-                    <span class="dot hot"></span> Hot
-                    <span class="dot critical"></span> Critical
-                    <span class="dot cooling"></span> Cooling Active
+                <h2>Server Room 01 <span class="subtitle">— Live Monitoring</span></h2>
+                <div class="top-bar-right">
+                    <div class="legend">
+                        <span class="dot normal"></span> Normal
+                        <span class="dot warm"></span> Warm
+                        <span class="dot hot"></span> Hot
+                        <span class="dot critical"></span> Critical
+                        <span class="dot cooling"></span> Cooling
+                    </div>
+                    <button class="btn-heatmap" id="openHeatmap">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        Heatmap View
+                    </button>
                 </div>
             </header>
+
+            <!-- Heatmap Modal -->
+            <div class="heatmap-overlay" id="heatmapOverlay">
+                <div class="heatmap-modal">
+                    <div class="heatmap-header">
+                        <div>
+                            <h3>Server Temperature Heatmap</h3>
+                            <p class="heatmap-sub">Live thermal view — 4 racks × 6 servers</p>
+                        </div>
+                        <button class="heatmap-close" id="closeHeatmap">✕</button>
+                    </div>
+                    <div class="heatmap-body">
+                        <div class="heatmap-grid" id="heatmapGrid">
+                            <!-- Generated by JS -->
+                        </div>
+                        <div class="heatmap-legend">
+                            <span class="heatmap-legend-label">Cold</span>
+                            <div class="heatmap-legend-bar"></div>
+                            <span class="heatmap-legend-label">Hot</span>
+                        </div>
+                        <div class="heatmap-stats">
+                            <div class="heatmap-stat">
+                                <span class="heatmap-stat-label">Min Temp</span>
+                                <span class="heatmap-stat-value" id="hmMinTemp">--°F</span>
+                            </div>
+                            <div class="heatmap-stat">
+                                <span class="heatmap-stat-label">Avg Temp</span>
+                                <span class="heatmap-stat-value" id="hmAvgTemp">--°F</span>
+                            </div>
+                            <div class="heatmap-stat">
+                                <span class="heatmap-stat-label">Max Temp</span>
+                                <span class="heatmap-stat-value" id="hmMaxTemp">--°F</span>
+                            </div>
+                            <div class="heatmap-stat">
+                                <span class="heatmap-stat-label">Hot Servers</span>
+                                <span class="heatmap-stat-value danger" id="hmHotCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Water Savings Metrics Bar -->
+            <div class="metrics-bar">
+                <div class="metric-card">
+                    <span class="metric-label">Water Saved (AI Mode)</span>
+                    <span class="metric-value green" id="waterSaved">0.0 gal</span>
+                    <span class="metric-sub">vs. reactive cooling</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Spikes Prevented</span>
+                    <span class="metric-value blue" id="spikesPrevented">0</span>
+                    <span class="metric-sub">proactive interventions</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">AI Efficiency</span>
+                    <span class="metric-value" id="aiEfficiency">0%</span>
+                    <span class="metric-sub">of cooling events proactive</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Active Cooling Units</span>
+                    <span class="metric-value yellow" id="activeCoolingCount">0</span>
+                    <span class="metric-sub">of 24 servers</span>
+                </div>
+            </div>
 
             <div class="dashboard-grid">
                 <!-- 3D Visualization Section -->
                 <section class="visualization-container">
                     <div id="canvas-container"></div>
-                    <div class="canvas-overlay">
-                        <div class="overlay-stat">
-                            <span class="label">Active Cooling Units</span>
-                            <span class="value" id="activeCoolingCount">0</span>
-                        </div>
-                    </div>
                 </section>
 
                 <!-- Server Grid Status -->
