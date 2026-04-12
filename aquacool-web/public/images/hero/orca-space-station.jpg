@@ -1,0 +1,14 @@
+<svg width="1200" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="space" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#000011;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000033;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="600" fill="url(#space)"/>
+  <circle cx="200" cy="100" r="2" fill="white" opacity="0.8"/>
+  <circle cx="800" cy="150" r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="1000" cy="80" r="1" fill="white" opacity="0.7"/>
+  <rect x="400" y="250" width="400" height="200" fill="#333333" stroke="#666666" stroke-width="2"/>
+  <text x="600" y="360" font-family="Arial" font-size="24" fill="white" text-anchor="middle">ORCA Space Station</text>
+</svg>

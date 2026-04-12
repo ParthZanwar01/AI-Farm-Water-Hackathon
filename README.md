@@ -31,6 +31,12 @@ python app.py
 
 3. Open `http://localhost:5001` in your browser
 
+The ML model **trains in a background thread** on startup so the server returns immediately. For a few seconds, predictions use safe defaults until training finishes. To force the old blocking train (debug only), set `AQUACOOL_SYNC_TRAIN=1`.
+
+### Marketing site (React)
+
+The full multi-page Space Apps–style site lives in `aquacool-web/`. From that folder run `npm install` and `npm run dev`. Set `VITE_SIMULATOR_URL` if your Flask demo is not on `http://localhost:5001`.
+
 ## Project Structure
 
 ```

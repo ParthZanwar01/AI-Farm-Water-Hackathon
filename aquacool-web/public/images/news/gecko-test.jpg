@@ -1,0 +1,6 @@
+<svg width="400" height="250" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="250" fill="#0b2545"/>
+  <rect x="100" y="75" width="200" height="100" fill="#007bff" opacity="0.8"/>
+  <text x="200" y="135" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Gecko Grippers</text>
+  <text x="200" y="155" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Microgravity Tests</text>
+</svg>

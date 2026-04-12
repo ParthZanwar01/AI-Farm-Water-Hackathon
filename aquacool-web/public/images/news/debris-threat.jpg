@@ -1,0 +1,8 @@
+<svg width="400" height="250" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="250" fill="#000033"/>
+  <circle cx="200" cy="125" r="80" fill="#333333" stroke="#666666" stroke-width="2"/>
+  <circle cx="150" cy="100" r="3" fill="#ff0000"/>
+  <circle cx="250" cy="150" r="2" fill="#ff0000"/>
+  <circle cx="180" cy="180" r="2.5" fill="#ff0000"/>
+  <text x="200" y="220" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Orbital Debris Threat</text>
+</svg>

@@ -1,0 +1,6 @@
+<svg width="400" height="250" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="250" fill="#0b2545"/>
+  <rect x="50" y="50" width="300" height="150" fill="#6f42c1" opacity="0.8"/>
+  <text x="200" y="130" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Phase 3</text>
+  <text x="200" y="155" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Scaled Operations</text>
+</svg>

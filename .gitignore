@@ -32,3 +32,8 @@ Thumbs.db
 
 # Netlify - ignore Python runtime for frontend
 runtime.txt
+
+# Vite React marketing site
+aquacool-web/node_modules/
+aquacool-web/dist/
+aquacool-web/.next/

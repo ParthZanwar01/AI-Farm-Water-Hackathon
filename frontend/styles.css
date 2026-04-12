@@ -627,6 +627,12 @@ input[type="radio"]:checked + .toggle-btn.special {
 }
 
 /* About link */
+.sidebar-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
 .about-link {
     display: block;
     text-align: center;

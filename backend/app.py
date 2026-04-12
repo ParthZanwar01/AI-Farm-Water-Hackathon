@@ -102,29 +102,33 @@ def train_model_async():
         import traceback
         traceback.print_exc()
 
-# Start training in background thread (non-blocking)
-# This allows gunicorn to start immediately while model trains
-# Render sets PORT environment variable, so use that to detect production
+# Start training in background thread (non-blocking) in all environments.
+# Synchronous training on import blocked local startup for minutes (sklearn fit + large CSV).
+# Set AQUACOOL_SYNC_TRAIN=1 to force blocking train for debugging.
 is_production = os.environ.get('PORT') is not None or os.environ.get('FLASK_ENV') == 'production'
+sync_train = os.environ.get('AQUACOOL_SYNC_TRAIN', '').lower() in ('1', 'true', 'yes')
 
-if is_production:
-    # In production, train async to avoid blocking gunicorn startup
-    if predictor_ready:
-        training_thread = threading.Thread(target=train_model_async, daemon=True)
-        training_thread.start()
-        print("🚀 Flask app ready, model training in background...")
-    else:
-        print("🚀 Flask app ready (predictor not available, running without ML)")
+# With Flask debug reloader: skip the watcher parent; train in the child (or always if no reloader).
+# See https://werkzeug.palletsprojects.com/en/stable/serving/#reloader
+_should_start_background_train = (
+    os.environ.get('WERKZEUG_RUN_MAIN') == 'true'
+    or os.environ.get('WERKZEUG_SERVER_FD') is None
+)
+
+if predictor_ready and sync_train and not is_production:
+    print("Training model synchronously (AQUACOOL_SYNC_TRAIN=1)...")
+    try:
+        predictor.train()
+    except Exception as e:
+        print(f"⚠️  Model training failed: {e}")
+elif predictor_ready and _should_start_background_train:
+    training_thread = threading.Thread(target=train_model_async, daemon=True)
+    training_thread.start()
+    print("🚀 Flask app ready, model training in background...")
+elif predictor_ready:
+    print("🚀 Flask reloader parent — skipping duplicate model training start")
 else:
-    # In development, train synchronously for easier debugging
-    if predictor_ready:
-        print("Training model synchronously (development mode)...")
-        try:
-            predictor.train()
-        except Exception as e:
-            print(f"⚠️  Model training failed: {e}")
-    else:
-        print("⚠️  Running without ML model (predictor not initialized)")
+    print("🚀 Flask app ready (predictor not available, running without ML)")
 
 # Simulated server state (24 server areas)
 server_state = {

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AquaCool AI — Adaptive Cooling &amp; Predictive Aqueduct</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gray: {
+              750: '#2d3748',
+            }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="min-h-screen bg-gray-900 text-white antialiased">
+  <!-- Layout matches Space-Apps-Web1: Navigation.tsx -->
+  <nav class="bg-black/80 backdrop-blur-sm fixed w-full z-50 border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="mission-stitch.html" class="flex items-center space-x-3 shrink-0">
+          <img src="favicon.svg" alt="" class="w-8 h-8 object-contain" width="32" height="32"/>
+          <span class="text-lg sm:text-xl font-bold tracking-wide max-w-[200px] sm:max-w-none leading-tight">AquaCool AI</span>
+        </a>
+
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="mission-stitch.html" class="hover:text-red-500 transition-colors">Mission</a>
+          <div class="relative" id="nav-learn-wrap">
+            <button type="button" id="nav-learn-btn" class="flex items-center space-x-1 hover:text-red-500 transition-colors">
+              <span>Learn</span>
+              <svg class="w-4 h-4 transition-transform duration-200" id="nav-learn-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div id="nav-learn-dd" class="hidden absolute top-full mt-2 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl">
+              <a href="about.html" class="block px-4 py-3 hover:bg-gray-700 border-b border-gray-700">Why AquaCool AI</a>
+              <a href="mission.html" class="block px-4 py-3 hover:bg-gray-700">Protocol (brief)</a>
+            </div>
+          </div>
+          <div class="relative" id="nav-app-wrap">
+            <button type="button" id="nav-app-btn" class="flex items-center space-x-1 hover:text-red-500 transition-colors">
+              <span>App</span>
+              <svg class="w-4 h-4 transition-transform duration-200" id="nav-app-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div id="nav-app-dd" class="hidden absolute top-full mt-2 right-0 w-52 bg-gray-800 border border-gray-700 rounded-lg shadow-xl">
+              <a href="index.html" class="block px-4 py-3 hover:bg-gray-700 border-b border-gray-700">Live demo (3D)</a>
+              <a href="index.html" class="block px-4 py-3 hover:bg-gray-700">Server room</a>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" id="nav-mobile-btn" class="md:hidden p-2" aria-label="Menu">
+          <svg id="nav-icon-open" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg id="nav-icon-close" class="w-6 h-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="nav-mobile-panel" class="hidden md:hidden bg-gray-800 border-t border-gray-700">
+      <div class="px-4 py-3 space-y-3">
+        <a href="mission-stitch.html" class="block hover:text-red-500 transition-colors">Mission</a>
+        <div class="space-y-2">
+          <p class="font-semibold text-gray-400 text-sm">Learn</p>
+          <a href="about.html" class="block pl-4 hover:text-red-500 transition-colors">Why AquaCool AI</a>
+          <a href="mission.html" class="block pl-4 hover:text-red-500 transition-colors">Protocol (brief)</a>
+        </div>
+        <div class="space-y-2">
+          <p class="font-semibold text-gray-400 text-sm">App</p>
+          <a href="index.html" class="block pl-4 hover:text-red-500 transition-colors">Live demo</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Home.tsx–style hero -->
+  <div class="min-h-screen">
+    <section class="relative pt-24 pb-32 px-4 overflow-hidden min-h-screen flex items-center">
+      <div
+        class="absolute inset-0 bg-cover bg-center"
+        style="background-image: url(https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1920); filter: brightness(0.3);"
+      ></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-gray-900"></div>
+
+      <div class="absolute inset-0 opacity-30 pointer-events-none">
+        <div class="absolute top-20 left-10 w-2 h-2 bg-white rounded-full animate-pulse"></div>
+        <div class="absolute top-40 right-20 w-1 h-1 bg-white rounded-full animate-pulse" style="animation-delay: 100ms"></div>
+        <div class="absolute bottom-40 left-1/4 w-1 h-1 bg-white rounded-full animate-pulse" style="animation-delay: 200ms"></div>
+        <div class="absolute top-1/3 right-1/3 w-2 h-2 bg-white rounded-full animate-pulse" style="animation-delay: 300ms"></div>
+      </div>
+
+      <div class="relative max-w-7xl mx-auto w-full">
+        <div class="flex flex-col items-start justify-center">
+          <p class="text-sm uppercase tracking-[0.25em] text-gray-300 mb-4">Adaptive Cooling &amp; Predictive Aqueduct</p>
+          <h1 class="text-4xl sm:text-6xl md:text-8xl font-bold mb-6 text-white leading-tight">
+            AquaCool AI
+            <br/>
+            <span class="text-gray-100">Technologies</span>
+          </h1>
+          <div class="w-24 h-1 bg-yellow-600 mb-8"></div>
+          <p class="text-xl md:text-2xl text-gray-200 max-w-3xl leading-relaxed">
+            Intelligent water cooling for AI data centers — machine learning predicts heat spikes before they happen, so cooling is proactive instead of flooding entire zones.
+          </p>
+          <p class="text-lg md:text-xl text-gray-300 max-w-3xl leading-relaxed mt-6">
+            Same thermal protection with roughly <strong class="text-white">60% less water</strong> per cooling event versus reactive control: sense early, commit flow only where the spike forms, stand down as soon as equilibrium returns.
+          </p>
+          <div class="mt-10 flex flex-wrap gap-4">
+            <a href="index.html" class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg transition-colors">Live demo</a>
+            <a href="about.html" class="inline-flex items-center px-6 py-3 border border-gray-600 hover:border-red-500 hover:text-red-400 rounded-lg transition-colors">Deep dive</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Home.tsx mission overview section pattern -->
+    <section class="relative py-24 px-4 bg-black">
+      <div
+        class="absolute inset-0 bg-cover bg-center opacity-20 pointer-events-none"
+        style="background-image: url(https://images.pexels.com/photos/2159/flight-sky-earth-space.jpg?auto=compress&amp;cs=tinysrgb&amp;w=1920)"
+      ></div>
+      <div class="relative max-w-7xl mx-auto">
+        <h2 class="text-4xl md:text-5xl font-bold mb-8 text-center">AquaCool Mission Overview</h2>
+        <div class="w-24 h-1 bg-red-500 mb-12 mx-auto"></div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="bg-gray-900/80 backdrop-blur-sm p-8 rounded-lg border border-gray-800">
+            <h3 class="text-2xl font-bold mb-4 text-red-500">Observe</h3>
+            <p class="text-gray-300 leading-relaxed">
+              Continuous thermal telemetry across <strong class="text-white">24 server zones</strong> in four racks at a one-second cadence — temperature, cooling state, and neighbor diffusion feed a rolling buffer for training and live inference.
+            </p>
+          </div>
+          <div class="bg-gray-900/80 backdrop-blur-sm p-8 rounded-lg border border-gray-800">
+            <h3 class="text-2xl font-bold mb-4 text-blue-400">Infer</h3>
+            <p class="text-gray-300 leading-relaxed">
+              Ensemble ML (gradient boosting / random forest) scores spike probability from <strong class="text-white">37+ engineered features</strong> — lags, rolling stats, rack neighbors, calendars — pre-authorizing cooling above ~70% confidence before hard thresholds.
+            </p>
+          </div>
+          <div class="bg-gray-900/80 backdrop-blur-sm p-8 rounded-lg border border-gray-800">
+            <h3 class="text-2xl font-bold mb-4 text-yellow-600">Interdict</h3>
+            <p class="text-gray-300 leading-relaxed">
+              Targeted partial flow (~<strong class="text-white">0.8 gal</strong> per proactive event) replaces reactive deluge (~2.0 gal). A failsafe still trips at 85°F — but in AI mode the goal is to never need it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORCA.tsx problem-style block -->
+    <section class="relative py-20 px-4 bg-gray-900">
+      <div
+        class="absolute inset-0 bg-cover bg-center opacity-10 pointer-events-none"
+        style="background-image: url(https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1920)"
+      ></div>
+      <div class="relative max-w-5xl mx-auto">
+        <h2 class="text-4xl font-bold mb-8">The Problem We Solve</h2>
+        <div class="w-20 h-1 bg-red-500 mb-8"></div>
+        <div class="space-y-6 text-lg text-gray-300 leading-relaxed">
+          <p>
+            AI clusters push data-center heat loads faster than many sites can justify fresh water for evaporative towers. Default controls wait for danger, then run cooling at maximum — wasting water and stressing hardware.
+          </p>
+          <p>
+            Reactive systems only act after temperatures breach a trip line (e.g. 85°F). By then the plant needs full flow. There is no anticipation — only reaction — so every event pays the highest hydraulic and thermal price.
+          </p>
+          <p>
+            AquaCool closes the loop: predict the spike from live patterns, cool earlier in a narrower band, and shut off aggressively — delivering the same safety class with materially lower water per intervention.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer.tsx pattern -->
+  <footer class="bg-black border-t border-gray-800 py-12 px-4">
+    <div class="max-w-7xl mx-auto text-center">
+      <div class="flex items-center justify-center space-x-3 mb-4">
+        <img src="favicon.svg" alt="" class="w-6 h-6 object-contain" width="24" height="24"/>
+        <span class="text-xl font-bold">AquaCool AI</span>
+      </div>
+      <p class="text-gray-400">Adaptive Cooling &amp; Predictive Aqueduct</p>
+      <p class="text-gray-500 mt-4 text-sm">AI Farm Water hackathon — predictive cooling demo</p>
+      <div class="mt-6 flex flex-wrap justify-center gap-6 text-sm">
+        <a href="index.html" class="text-gray-400 hover:text-red-500 transition-colors">Live demo</a>
+        <a href="about.html" class="text-gray-400 hover:text-red-500 transition-colors">Why AquaCool</a>
+        <a href="mission.html" class="text-gray-400 hover:text-red-500 transition-colors">Alternate brief</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      function setChev(el, open) {
+        el.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+      }
+      function closeDropdowns() {
+        document.getElementById('nav-learn-dd').classList.add('hidden');
+        document.getElementById('nav-app-dd').classList.add('hidden');
+        setChev(document.getElementById('nav-learn-chev'), false);
+        setChev(document.getElementById('nav-app-chev'), false);
+      }
+
+      document.getElementById('nav-learn-btn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        document.getElementById('nav-app-dd').classList.add('hidden');
+        setChev(document.getElementById('nav-app-chev'), false);
+        var dd = document.getElementById('nav-learn-dd');
+        var willShow = dd.classList.contains('hidden');
+        dd.classList.toggle('hidden');
+        setChev(document.getElementById('nav-learn-chev'), willShow);
+      });
+      document.getElementById('nav-app-btn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        document.getElementById('nav-learn-dd').classList.add('hidden');
+        setChev(document.getElementById('nav-learn-chev'), false);
+        var dd = document.getElementById('nav-app-dd');
+        var willShow = dd.classList.contains('hidden');
+        dd.classList.toggle('hidden');
+        setChev(document.getElementById('nav-app-chev'), willShow);
+      });
+      document.addEventListener('click', function () { closeDropdowns(); });
+
+      var mobileOpen = false;
+      document.getElementById('nav-mobile-btn').addEventListener('click', function () {
+        mobileOpen = !mobileOpen;
+        document.getElementById('nav-mobile-panel').classList.toggle('hidden', !mobileOpen);
+        document.getElementById('nav-icon-open').classList.toggle('hidden', mobileOpen);
+        document.getElementById('nav-icon-close').classList.toggle('hidden', !mobileOpen);
+      });
+    })();
+  </script>
+</body>
+</html>
