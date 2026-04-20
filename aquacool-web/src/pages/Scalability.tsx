@@ -16,7 +16,7 @@ export default function Scalability() {
 
         <div className="relative max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">Scalability &amp; sustainability</h1>
-          <div className="w-20 h-1 bg-yellow-600 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-2xl text-gray-200 leading-relaxed">
             Multi-site software architecture and water-stewardship narratives that compound as AquaCool attaches to more
             megawatts of AI load.
@@ -232,7 +232,7 @@ export default function Scalability() {
         ></div>
         <div className="relative max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold mb-8">Long-term vision</h2>
-          <div className="w-20 h-1 bg-yellow-600 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-lg text-gray-300 leading-relaxed mb-6">
             Fleet-scale AquaCool becomes the default coordination layer between AI schedulers and facility plants —
             training jobs negotiate their thermal envelopes the same way they negotiate GPUs.

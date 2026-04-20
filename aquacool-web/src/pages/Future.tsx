@@ -15,7 +15,7 @@ export default function Future() {
 
         <div className="relative max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">Future</h1>
-          <div className="w-20 h-1 bg-yellow-600 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-2xl text-gray-200 leading-relaxed">
             From single-site twins to grid-aware fleets that co-optimize AI throughput, water, and electricity in real
             time.
@@ -143,7 +143,7 @@ export default function Future() {
       </section>
 
       <section className="relative py-20 px-4 bg-gray-900 text-center">
-        <Rocket className="w-14 h-14 text-red-500 mx-auto mb-6" />
+        <Rocket className="w-14 h-14 text-cyan-400 mx-auto mb-6" />
         <h2 className="text-3xl font-bold mb-4">Let&apos;s build calmer data halls</h2>
         <p className="text-gray-300 max-w-2xl mx-auto">
           Start with the hackathon simulator, graduate to shadow deployments, then open the loop with mechanical

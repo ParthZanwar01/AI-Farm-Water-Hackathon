@@ -1,6 +1,6 @@
 #!/bin/bash
-# Simple build script for Netlify - replaces API URL placeholder in HTML
-# No Python or Node.js dependencies required
+# Legacy: injects API URL into frontend/index.html only (old “publish = frontend” flow).
+# Full site (React + simulator + API proxy): use scripts/netlify-build.sh — see docs/NETLIFY.md.
 
 API_URL="${REACT_APP_API_URL:-/api}"
 

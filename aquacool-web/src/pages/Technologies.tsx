@@ -18,7 +18,7 @@ export default function Technologies() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-5xl md:text-6xl font-bold mb-6">AquaCool Core Technologies</h1>
-              <div className="w-20 h-1 bg-yellow-600 mb-6"></div>
+              <div className="w-20 h-1 bg-cyan-500 mb-6"></div>
               <p className="text-xl text-gray-200 leading-relaxed mb-6">
                 Liquid cooling, edge telemetry, and ML policy engines working together to shave water intensity without
                 sacrificing thermal envelopes.
@@ -29,7 +29,7 @@ export default function Technologies() {
               </p>
             </div>
             <div className="flex justify-center">
-              <Cpu className="w-64 h-64 text-yellow-600 opacity-80" />
+              <Cpu className="w-64 h-64 text-cyan-500 opacity-80" />
             </div>
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function Technologies() {
         ></div>
         <div className="relative max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold mb-8">Integration &amp; testing</h2>
-          <div className="w-20 h-1 bg-yellow-600 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-lg text-gray-300 leading-relaxed mb-6">
             The hackathon stack emphasizes reproducibility: scripted data fetches, pinned sklearn versions, and a static
             frontend that can be hosted separately from the API for Netlify + Render style splits.

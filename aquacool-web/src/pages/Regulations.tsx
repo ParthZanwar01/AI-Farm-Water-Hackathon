@@ -16,7 +16,7 @@ export default function Regulations() {
 
         <div className="relative max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">Compliance &amp; standards</h1>
-          <div className="w-20 h-1 bg-red-500 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-2xl text-gray-200 leading-relaxed">
             Cooling touches life-safety, electrical codes, water permits, and workplace rules — AquaCool is designed for
             auditability from day one.

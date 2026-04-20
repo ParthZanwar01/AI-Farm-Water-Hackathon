@@ -35,7 +35,11 @@ The ML model **trains in a background thread** on startup so the server returns 
 
 ### Marketing site (React)
 
-The full multi-page Space Apps–style site lives in `aquacool-web/`. From that folder run `npm install` and `npm run dev`. Set `VITE_SIMULATOR_URL` if your Flask demo is not on `http://localhost:5001`.
+The full multi-page site lives in `aquacool-web/`. From that folder run `npm install` and `npm run dev`. Set `VITE_SIMULATOR_URL` if your Flask demo is not on `http://localhost:5001`.
+
+### Netlify (marketing + simulator + API proxy)
+
+Deploy the whole static experience from the **repo root** using `netlify.toml` and `scripts/netlify-build.sh`. Step-by-step instructions are in [docs/NETLIFY.md](docs/NETLIFY.md).
 
 ## Project Structure
 
@@ -72,8 +76,5 @@ The full multi-page Space Apps–style site lives in `aquacool-web/`. From that 
 
 ## Deployment
 
-The application can be deployed to:
-- **Backend**: Render, Railway, or Fly.io
-- **Frontend**: Netlify or Vercel
-
-Set the `API_BASE_URL` environment variable in your frontend deployment to point to your backend URL.
+- **Backend (Flask + ML):** Use the root **`Dockerfile`** (Render Blueprint in [`render.yaml`](render.yaml)) or native Python on Render/Railway/Fly — must expose `https://your-host/.../api/...`.
+- **Frontend (React + 3D simulator on Netlify):** See [docs/NETLIFY.md](docs/NETLIFY.md). The Netlify build proxies `/api/*` to your backend so the simulator can call same-origin `/api` after you set `BACKEND_ORIGIN`.

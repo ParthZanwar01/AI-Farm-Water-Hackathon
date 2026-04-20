@@ -148,7 +148,7 @@ export default function Components() {
 
         <div className="relative max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">AquaCool Components</h1>
-          <div className="w-20 h-1 bg-red-500 mx-auto mb-6"></div>
+          <div className="w-20 h-1 bg-cyan-500 mx-auto mb-6"></div>
           <p className="text-2xl text-gray-200 leading-relaxed mb-6 font-light max-w-4xl mx-auto">
             Physical and digital subsystems that turn telemetry into measured water savings.
           </p>
@@ -170,7 +170,7 @@ export default function Components() {
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Subsystem deep dives</h2>
-            <div className="w-20 h-1 bg-red-500 mx-auto mb-6"></div>
+            <div className="w-20 h-1 bg-cyan-500 mx-auto mb-6"></div>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Six modules map cleanly onto observe → infer → interdict responsibilities.
             </p>
@@ -228,7 +228,7 @@ export default function Components() {
                         <ul className="space-y-2">
                           {component.features.map((feature, featureIndex) => (
                             <li key={featureIndex} className="flex items-start">
-                              <ArrowRight className="w-4 h-4 text-red-500 mr-2 mt-1 flex-shrink-0" />
+                              <ArrowRight className="w-4 h-4 text-cyan-400 mr-2 mt-1 flex-shrink-0" />
                               <span className="text-gray-400">{feature}</span>
                             </li>
                           ))}
@@ -262,7 +262,7 @@ export default function Components() {
 
         <div className="relative max-w-6xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Integrated architecture</h2>
-          <div className="w-20 h-1 bg-red-500 mx-auto mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mx-auto mb-8"></div>
           <p className="text-xl text-gray-300 leading-relaxed mb-12 max-w-4xl mx-auto">
             Sense fabric, inference service, and actuation policy share contracts so each layer can evolve independently
             — swap sklearn for XGBoost, or Flask for FastAPI, without rewriting the twin.

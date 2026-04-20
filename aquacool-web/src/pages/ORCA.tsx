@@ -29,7 +29,7 @@ export default function ORCA() {
         <div className="relative max-w-7xl mx-auto w-full">
           <div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">AquaCool Cooling Platform</h1>
-            <div className="w-20 h-1 bg-red-500 mb-6"></div>
+            <div className="w-20 h-1 bg-cyan-500 mb-6"></div>
             <p className="text-2xl text-gray-200 leading-relaxed mb-6 font-light">
               Predictive liquid cooling for dense AI compute — same safety, less water.
             </p>
@@ -102,7 +102,7 @@ export default function ORCA() {
         ></div>
         <div className="relative max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold mb-8">The Problem We Solve</h2>
-          <div className="w-20 h-1 bg-red-500 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <div className="space-y-6 text-lg text-gray-300 leading-relaxed">
             <p>
               Hyperscale AI training pushes facility heat rejection faster than many campuses can justify in evaporative
@@ -131,7 +131,7 @@ export default function ORCA() {
         ></div>
         <div className="relative max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center">AquaCool System Architecture</h2>
-          <div className="w-20 h-1 bg-red-500 mx-auto mb-12"></div>
+          <div className="w-20 h-1 bg-cyan-500 mx-auto mb-12"></div>
 
           <div className="space-y-16">
             <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -156,8 +156,8 @@ export default function ORCA() {
               </div>
               <div className="flex justify-center">
                 <img
-                  src="/images/satellite.png"
-                  alt="Control stack illustration"
+                  src="/images/predictiveMaintainence.png"
+                  alt="Telemetry and control plane abstraction"
                   className="w-[500px] h-[500px] md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px] object-contain"
                 />
               </div>
@@ -166,8 +166,8 @@ export default function ORCA() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="order-2 md:order-1">
                 <img
-                  src="/images/grabsat.png"
-                  alt="Cooling distribution"
+                  src="/images/heatcont2.png"
+                  alt="Liquid cooling and manifold distribution"
                   className="w-[500px] h-[500px] md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px] object-contain mx-auto"
                 />
               </div>
@@ -213,8 +213,8 @@ export default function ORCA() {
               </div>
               <div className="flex justify-center">
                 <img
-                  src="/images/websat.png"
-                  alt="Edge sensing illustration"
+                  src="/images/heatcont3.png"
+                  alt="Thermal sensing across the server floor"
                   className="w-[500px] h-[500px] md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px] object-contain"
                 />
               </div>
@@ -303,7 +303,7 @@ function TimelineSection() {
       <div className="relative max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4">Product roadmap</h2>
-          <div className="w-20 h-1 bg-red-500 mx-auto mb-6"></div>
+          <div className="w-20 h-1 bg-cyan-500 mx-auto mb-6"></div>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             From credible simulation to production-grade cooling coordination.
           </p>
@@ -331,7 +331,7 @@ function TimelineSection() {
                   </div>
 
                   <div className={`ml-16 md:ml-0 w-full md:w-5/12 ${index % 2 === 0 ? 'md:pr-8' : 'md:pl-8'}`}>
-                    <div className="bg-gray-900/80 backdrop-blur-sm p-6 rounded-lg border border-gray-800 hover:border-gray-700 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10">
+                    <div className="bg-gray-900/80 backdrop-blur-sm p-6 rounded-lg border border-gray-800 hover:border-gray-700 transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/10">
                       <div className="flex items-center mb-3">
                         <IconComponent className={`w-6 h-6 ${item.color} mr-3`} />
                         <span className="text-2xl font-bold text-white">{item.year}</span>

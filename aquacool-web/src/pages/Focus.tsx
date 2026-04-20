@@ -15,7 +15,7 @@ export default function Focus() {
 
         <div className="relative max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">Our focus</h1>
-          <div className="w-20 h-1 bg-blue-400 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-2xl text-gray-200 leading-relaxed">
             Prioritizing AI-dense rows, water-constrained campuses, and operators who need defensible savings metrics —
             not just cooler charts.

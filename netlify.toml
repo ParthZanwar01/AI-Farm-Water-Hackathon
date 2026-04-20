@@ -1,23 +1,12 @@
-[build]
-  publish = "frontend"
-  # Simple shell script to inject API URL (no Python/Node.js needed)
-  command = "bash build.sh"
+# AI Farm / AquaCool — deploy from repository root (Dashboard: base directory empty, or use this file only).
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[build]
+  command = "bash scripts/netlify-build.sh"
+  publish = "aquacool-web/dist"
 
 [build.environment]
-  # Backend API URL - Update this if your Render URL changes
-  REACT_APP_API_URL = "https://ai-farm-water-hackathon.onrender.com/api"
-  NODE_VERSION = "18"
-  # Explicitly tell Netlify to skip Python
-  PYTHON_VERSION = ""
-  # Disable Python detection
-  SKIP_PYTHON = "true"
-
-[context.production.environment]
-  NODE_VERSION = "18"
-  PYTHON_VERSION = ""
-  SKIP_PYTHON = "true"
+  NODE_VERSION = "20"
+  # Flask API host (no trailing slash). Used to generate the /api/* proxy in _redirects.
+  BACKEND_ORIGIN = "https://ai-farm-water-hackathon.onrender.com"
+  # Simulator fetch() base inside the static demo (same-origin /api when proxy is enabled).
+  REACT_APP_API_URL = "/api"

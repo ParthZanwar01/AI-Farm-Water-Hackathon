@@ -16,7 +16,7 @@ export default function Financial() {
 
         <div className="relative max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">Financial outlook</h1>
-          <div className="w-20 h-1 bg-blue-400 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-2xl text-gray-200 leading-relaxed">
             SaaS + performance fees tied to measurable water and energy savings — not science-project budgets alone.
           </p>
@@ -191,7 +191,7 @@ export default function Financial() {
         ></div>
         <div className="relative max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold mb-8">Investor notes</h2>
-          <div className="w-20 h-1 bg-blue-400 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
 
           <div className="space-y-6 text-lg text-gray-300 leading-relaxed mb-12">
             <p>

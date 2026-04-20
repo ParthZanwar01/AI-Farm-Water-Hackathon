@@ -43,7 +43,7 @@ export default function Navigation() {
           </Link>
 
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="hover:text-red-500 transition-colors shrink-0">
+            <Link to="/" className="hover:text-cyan-400 transition-colors shrink-0">
               Home
             </Link>
             <a
@@ -62,7 +62,7 @@ export default function Navigation() {
                   setBusinessPlanOpen(!businessPlanOpen);
                   setPrototypesOpen(false);
                 }}
-                className="flex items-center space-x-1 hover:text-red-500 transition-colors"
+                className="flex items-center space-x-1 hover:text-cyan-400 transition-colors"
               >
                 <span>Project plan</span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${businessPlanOpen ? 'rotate-180' : ''}`} />
@@ -86,14 +86,14 @@ export default function Navigation() {
                   setPrototypesOpen(!prototypesOpen);
                   setBusinessPlanOpen(false);
                 }}
-                className="flex items-center space-x-1 hover:text-red-500 transition-colors"
+                className="flex items-center space-x-1 hover:text-cyan-400 transition-colors"
               >
                 <span>System &amp; tech</span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${prototypesOpen ? 'rotate-180' : ''}`} />
               </button>
               {prototypesOpen && (
                 <div className="absolute top-full mt-2 w-72 bg-gray-800 border border-gray-700 rounded-lg shadow-xl">
-                  <Link to="/orca" onClick={closeAllDropdowns} className="block px-4 py-3 hover:bg-gray-700 transition-colors border-b border-gray-700">Cooling platform</Link>
+                  <Link to="/platform" onClick={closeAllDropdowns} className="block px-4 py-3 hover:bg-gray-700 transition-colors border-b border-gray-700">Cooling platform</Link>
                   <Link to="/neural-detection" onClick={closeAllDropdowns} className="block px-4 py-3 hover:bg-gray-700 transition-colors border-b border-gray-700">Heat prediction engine</Link>
                   <Link to="/technologies" onClick={closeAllDropdowns} className="block px-4 py-3 hover:bg-gray-700 transition-colors border-b border-gray-700">Technologies</Link>
                   <Link to="/components" onClick={closeAllDropdowns} className="block px-4 py-3 hover:bg-gray-700 transition-colors">Core components</Link>
@@ -116,23 +116,23 @@ export default function Navigation() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-gray-800 border-t border-gray-700">
           <div className="px-4 py-3 space-y-3">
-            <Link to="/" className="block hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+            <Link to="/" className="block hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Home</Link>
             <a href={SIMULATOR_URL} target="_blank" rel="noopener noreferrer" className="block text-cyan-400 font-semibold">Live simulator</a>
             <div className="space-y-2">
               <p className="font-semibold text-gray-400 text-sm">Project plan</p>
-              <Link to="/development" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Development</Link>
-              <Link to="/financial" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Financial outlook</Link>
-              <Link to="/scalability" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Scalability &amp; sustainability</Link>
-              <Link to="/regulations" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Compliance &amp; standards</Link>
-              <Link to="/focus" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Our focus</Link>
-              <Link to="/future" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Future</Link>
+              <Link to="/development" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Development</Link>
+              <Link to="/financial" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Financial outlook</Link>
+              <Link to="/scalability" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Scalability &amp; sustainability</Link>
+              <Link to="/regulations" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Compliance &amp; standards</Link>
+              <Link to="/focus" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Our focus</Link>
+              <Link to="/future" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Future</Link>
             </div>
             <div className="space-y-2">
               <p className="font-semibold text-gray-400 text-sm">System &amp; tech</p>
-              <Link to="/orca" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Cooling platform</Link>
-              <Link to="/neural-detection" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Heat prediction engine</Link>
-              <Link to="/technologies" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Technologies</Link>
-              <Link to="/components" className="block pl-4 hover:text-red-500 transition-colors" onClick={() => setMobileMenuOpen(false)}>Core components</Link>
+              <Link to="/platform" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Cooling platform</Link>
+              <Link to="/neural-detection" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Heat prediction engine</Link>
+              <Link to="/technologies" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Technologies</Link>
+              <Link to="/components" className="block pl-4 hover:text-cyan-400 transition-colors" onClick={() => setMobileMenuOpen(false)}>Core components</Link>
             </div>
           </div>
         </div>

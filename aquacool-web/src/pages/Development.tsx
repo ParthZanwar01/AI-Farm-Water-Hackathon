@@ -16,7 +16,7 @@ export default function Development() {
 
         <div className="relative max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">AquaCool Development Plan</h1>
-          <div className="w-20 h-1 bg-red-500 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-2xl text-gray-200 leading-relaxed">
             A three-phase path from credible simulation to closed-loop advisory cooling in production data halls.
           </p>
@@ -167,7 +167,7 @@ export default function Development() {
       <section className="relative py-20 px-4 bg-gray-900">
         <div className="relative max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold mb-8">Risk management</h2>
-          <div className="w-20 h-1 bg-red-500 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-lg text-gray-300 leading-relaxed mb-6">
             Cooling mistakes can strand GPUs or void warranties. AquaCool treats ML as advisory until mechanical teams
             sign off — every release bundles fault trees, rollback switches, and dry-run simulations.

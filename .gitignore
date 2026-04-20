@@ -37,3 +37,6 @@ runtime.txt
 aquacool-web/node_modules/
 aquacool-web/dist/
 aquacool-web/.next/
+
+# Local Netlify folder
+.netlify

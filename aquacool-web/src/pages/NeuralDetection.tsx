@@ -18,11 +18,11 @@ export default function NeuralDetection() {
         <div className="relative max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="order-2 md:order-1 flex justify-center">
-              <Brain className="w-64 h-64 text-blue-400 opacity-80" />
+              <Brain className="w-64 h-64 text-cyan-400 opacity-80" />
             </div>
             <div className="order-1 md:order-2">
               <h1 className="text-5xl md:text-6xl font-bold mb-6">Heat Prediction Engine</h1>
-              <div className="w-20 h-1 bg-blue-400 mb-6"></div>
+              <div className="w-20 h-1 bg-cyan-500 mb-6"></div>
               <p className="text-xl text-gray-200 leading-relaxed mb-6">
                 Ensemble classifiers consume per-server time series and spatial context to estimate the probability of an
                 imminent heat spike — driving proactive cooling instead of threshold-only alarms.
@@ -48,7 +48,7 @@ export default function NeuralDetection() {
           <h2 className="text-4xl font-bold mb-12 text-center">Model architecture</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-gray-900/80 backdrop-blur-sm p-8 rounded-lg border border-gray-800">
-              <Network className="w-12 h-12 text-blue-400 mb-4" />
+              <Network className="w-12 h-12 text-cyan-400 mb-4" />
               <h3 className="text-2xl font-bold mb-4">Feature fabric</h3>
               <p className="text-gray-300 leading-relaxed mb-4">
                 Temporal encodings (hour, day, business hours), multi-step temperature lags, rolling means/std/min/max,
@@ -89,7 +89,7 @@ export default function NeuralDetection() {
         ></div>
         <div className="relative max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold mb-8">Training &amp; validation</h2>
-          <div className="w-20 h-1 bg-blue-400 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <div className="space-y-6 text-lg text-gray-300 leading-relaxed">
             <p>
               Models train on historical spike tables augmented with simulation exports. Walk-forward splits respect
@@ -100,11 +100,11 @@ export default function NeuralDetection() {
               when plant engineers need to trust pre-cooling recommendations.
             </p>
             <div className="bg-black/50 backdrop-blur-sm p-6 rounded-lg border border-gray-800 mt-8">
-              <Database className="w-12 h-12 text-blue-400 mb-4" />
+              <Database className="w-12 h-12 text-cyan-400 mb-4" />
               <h3 className="text-2xl font-bold mb-4">Demo metrics</h3>
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
-                  <p className="text-3xl font-bold text-blue-400 mb-2">37+</p>
+                  <p className="text-3xl font-bold text-cyan-400 mb-2">37+</p>
                   <p className="text-gray-400">Features per tick</p>
                 </div>
                 <div>
@@ -131,7 +131,7 @@ export default function NeuralDetection() {
         ></div>
         <div className="relative max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold mb-8">Try the live twin</h2>
-          <div className="w-20 h-1 bg-blue-400 mb-8"></div>
+          <div className="w-20 h-1 bg-cyan-500 mb-8"></div>
           <p className="text-lg text-gray-300 leading-relaxed mb-8">
             The Flask + Three.js simulator visualizes rack temperatures, mode toggles, and cumulative water deltas. Run
             it locally alongside this marketing site for investor-style demos.
@@ -141,7 +141,7 @@ export default function NeuralDetection() {
               href={SIMULATOR_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+              className="inline-flex items-center px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
             >
               <Brain className="w-5 h-5 mr-2" />
               Open simulator

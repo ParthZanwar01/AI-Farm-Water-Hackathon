@@ -26,7 +26,7 @@ export default function Home() {
               <br />
               Technologies
             </h1>
-            <div className="w-24 h-1 bg-yellow-600 mb-8"></div>
+            <div className="w-24 h-1 bg-cyan-500 mb-8"></div>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl leading-relaxed">
               Adaptive Cooling &amp; Predictive Aqueduct — transforming reactive data-center water cooling into
               targeted, ML-driven thermal control before heat spikes breach safe limits.
@@ -44,12 +44,12 @@ export default function Home() {
           className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{
             backgroundImage:
-              'url(https://images.pexels.com/photos/2159/flight-sky-earth-space.jpg?auto=compress&cs=tinysrgb&w=1920)',
+              'url(https://images.pexels.com/photos/325229/pexels-photo-325229.jpeg?auto=compress&cs=tinysrgb&w=1920)',
           }}
         ></div>
         <div className="relative max-w-7xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold mb-8 text-center">AquaCool Mission Overview</h2>
-          <div className="w-24 h-1 bg-red-500 mb-12 mx-auto"></div>
+          <div className="w-24 h-1 bg-cyan-500 mb-12 mx-auto"></div>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-gray-900/80 backdrop-blur-sm p-8 rounded-lg border border-gray-800">
               <h3 className="text-2xl font-bold mb-4 text-red-500">Observe</h3>

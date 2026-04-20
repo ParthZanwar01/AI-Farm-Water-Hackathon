@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
@@ -33,7 +33,8 @@ function App() {
         <Navigation />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/orca" element={<ORCA />} />
+          <Route path="/platform" element={<ORCA />} />
+          <Route path="/orca" element={<Navigate to="/platform" replace />} />
           <Route path="/neural-detection" element={<NeuralDetection />} />
           <Route path="/technologies" element={<Technologies />} />
           <Route path="/components" element={<Components />} />

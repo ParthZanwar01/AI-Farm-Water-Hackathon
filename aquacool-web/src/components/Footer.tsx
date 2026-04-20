@@ -8,7 +8,7 @@ export default function Footer() {
         </div>
         <p className="text-gray-400">Adaptive Cooling &amp; Predictive Aqueduct</p>
         <p className="text-gray-500 mt-4 text-sm">
-          Intelligent water cooling for AI-scale data centers — hackathon prototype site (layout forked from Space Apps ORCA project).
+          Intelligent water cooling for AI-scale data centers — hackathon prototype.
         </p>
       </div>
     </footer>
